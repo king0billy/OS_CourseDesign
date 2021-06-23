@@ -163,7 +163,7 @@ public class MainGUI4 extends JFrame {
      * 更新正在执行
      */
     private void renew5(){
-        JOB job = scheduling.nowProess;
+        JOB job = scheduling.nowProcess;
         DefaultTableModel tableModel = (DefaultTableModel) table5.getModel();
         tableModel.getDataVector().clear();
         if(job!=null){
