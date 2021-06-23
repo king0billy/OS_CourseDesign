@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Scheduling {
     public List<JOB> well = new ArrayList<>();//输入井
-    public List<JOB> jobs = new ArrayList<>(); //后备队列
+    public List<JOB> jobs = new ArrayList<>(); //后备队列//没能进入内存(就绪队列的)
     public List<JOB> jobs1 = new ArrayList<>();    //未完成作业队列（保存着作业调度后的顺序）
     public HashMap<Integer, JOB> integerJobHashMap = new HashMap<>();//作业队列的内存块分配情况(会被取走)
     public HashMap<Integer, Block> integerBlockHashMap = new HashMap<>(); //块的情况表
@@ -23,6 +23,8 @@ public class Scheduling {
     public Clock clock = new Clock();//系统时间
     public int jobIDNum = 0;//ID号排列
     public boolean run = false;
+    public static int jobChoice=0;
+    public static int processChoice=0;
 
     public Scheduling() {
         init();
@@ -74,6 +76,9 @@ public class Scheduling {
             if (nowProcess == null) {
                 if (jobs2.size() != 0) {
                     nowProcess = jobs2.remove(0);
+                    //todo
+                    //nowProcess.setArriveReadyTime(clock.getTime());
+
                     nowProcess.setStatus('R');
                     System.out.println("时间：" + clock.getTime() + "|开始调用进程：" + nowProcess.toString());
                 } else if (integerJobHashMap.size() == 0 && well.size() == 0) {
@@ -169,7 +174,11 @@ public class Scheduling {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             jobArrive();
-            SJF();
+            if(jobChoice==2){
+                FCFS();
+            }else{
+                SJF();
+            }
             SPF();
         }
     }
@@ -204,7 +213,9 @@ public class Scheduling {
                     for (int blockID = 0; blockID <= integerBlockHashMap.size() - 1; blockID++) {
                         Block block = integerBlockHashMap.get(blockID);
                         if (block.getRemainSize() - job.getSize() >= 0) {
-                            if (bestFitBlockID == -1) bestFitBlockID = blockID;
+                            if (bestFitBlockID == -1) {
+                                bestFitBlockID = blockID;
+                            }
                             else if (block.getRemainSize() <= integerBlockHashMap.get(bestFitBlockID).getRemainSize()) {
                                 bestFitBlockID = blockID;
                             }
@@ -216,6 +227,10 @@ public class Scheduling {
                         block = integerBlockHashMap.get(bestFitBlockID);
                         block.setRemainSize(block.getRemainSize() - job.getSize());
                         block.addaJobID(jobID);
+                        //todo 成功分配到全部资源
+
+                        job.setArriveReadyTime(clock.getTime());
+
                         job.setState(1);
                         job.setBlockID(bestFitBlockID);
                         job.setTapeGet(true);
@@ -223,16 +238,31 @@ public class Scheduling {
                         integerBlockHashMap.put(bestFitBlockID, block);
                         integerJobHashMap.put(jobID, job);
                         System.out.println("时间：" + clock.getTime()+"作业分配成功：" + job.toString());
-                        //抢占(排好队等待调度)//todo 改这里看看
-                        if(nowProcess!=null && job.getServiceTime()< nowProcess.getServiceTime()-nowProcess.getTime()){
-                            nowProcess.setStatus('W');
-                            jobs2.add(0,nowProcess);
-                            jobs2.add(0,job);
-                            nowProcess = null;
-                            System.out.println("时间：" + clock.getTime()+"抢占成功"+job);
-                        }else {
-                            jobs2.add(job);
-                            jobs2.sort((o1, o2) -> o1.getServiceTime()-o2.getServiceTime());
+                        //抢占(排好队等待调度)//todo 改这里看看 job抢占了nowProcess jobs2.add
+                        //System.out.println(jobChoice+"   "+processChoice);
+                        if(processChoice==2){
+                            if (nowProcess != null && job.getArriveReadyTime() < nowProcess.getArriveReadyTime()) {
+                                nowProcess.setStatus('W');
+                                jobs2.add(0, nowProcess);
+                                jobs2.add(0, job);
+                                nowProcess = null;
+                                System.out.println("时间：" + clock.getTime() + "抢占成功" + job);
+                            } else {
+                                jobs2.add(job);
+                                jobs2.sort((o1, o2) -> o1.getArriveReadyTime() - o2.getArriveReadyTime());
+                            }
+                        }
+                        else {
+                            if (nowProcess != null && job.getServiceTime() < nowProcess.getServiceTime() - nowProcess.getTime()) {
+                                nowProcess.setStatus('W');
+                                jobs2.add(0, nowProcess);
+                                jobs2.add(0, job);
+                                nowProcess = null;
+                                System.out.println("时间：" + clock.getTime() + "抢占成功" + job);
+                            } else {
+                                jobs2.add(job);
+                                jobs2.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
+                            }
                         }
                     } else {
                         System.out.println("时间：" + clock.getTime()+"作业分配失败：" + job.toString());
@@ -300,7 +330,26 @@ public class Scheduling {
         integerBlockHashMap.put(block.getID(), block);
         return true;
     }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("输入2是FCFS!其他都是S*F");
+        System.out.println("先输入job的算法!");
+        try{
+            jobChoice=Integer.parseInt(bufferedReader.readLine());
+        } catch (Exception e){
+            jobChoice=1;
+            e.printStackTrace();
+        }
+        System.out.println("再输入process的算法!");
+        try{
+            processChoice=Integer.parseInt(bufferedReader.readLine());
+        } catch (Exception e){
+            processChoice=1;
+            e.printStackTrace();
+        }
+        System.out.println("jobChoice= "+jobChoice+" "+"processChoice= "+processChoice);
+//        jobChoice=2;processChoice=2;
+//        System.out.println("都选择了FCFS!");
         new Scheduling().run();
     }
 }

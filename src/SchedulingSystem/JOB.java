@@ -16,11 +16,20 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     private int time;          //已服务时间
     private int roundTime;    //周转时间
     private double aveRoundTime; //带权周转时间
-    private int source;        //所需资源
+    private int source;        //所需磁带机资源
     private char status;      //当前状态  W代表就绪 R代表正在运行 F代表完成
-    private int degree;        //优先级
-    private double hrrfRate;   //最高响应比
+    private int degree;        //优先级//没有用
+    private double hrrfRate;   //最高响应比//没有用
 
+    private int arriveReadyTime=99999999;
+
+    public int getArriveReadyTime() {
+        return arriveReadyTime;
+    }
+
+    public void setArriveReadyTime(int arriveReadyTime) {
+        this.arriveReadyTime = arriveReadyTime;
+    }
 
     public int getState() {
         return state;
