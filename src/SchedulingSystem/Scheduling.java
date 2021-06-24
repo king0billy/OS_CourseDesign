@@ -87,14 +87,18 @@ public class Scheduling {
                     }
                         nowProcess = jobs2.remove(0);
                     nowProcess.setStatus('R');
-                    System.out.println("时间：" + clock.getTime() + "|开始调用进程：" + nowProcess.printNeed());
+                    System.out.println("开始调用进程：" + nowProcess.printNeed());
                 } else if (integerJobHashMap.size() == 0 && well.size() == 0) {
-                    System.out.println("时间：" + clock.getTime() + "|任务完成");
+                    System.out.println("-----当前时间: "+JOB.timeFormat(clock.getTime())+"-----");
+                    System.out.println("任务完成");
                     System.out.println("________________以下是结果_________");
                     jobs3.sort(((o1, o2) ->o1.getID()-o2.getID()));
+                    double averageTime=0.0f;
                     for(int i=0;i<=jobs3.size()-1;i++){
                         System.out.println(jobs3.get(i).printResult());
+                        averageTime+=jobs3.get(i).getAveRoundTime();
                     }
+                    System.out.println("平均带权周转时间= " +String.format("%.2f", averageTime/jobs3.size()));
                     run = false;
                     return;
                 } else {
@@ -104,13 +108,14 @@ public class Scheduling {
             }
             //todo System.out.println("时间：" + clock.getTime() + "|正在执行：" + nowProcess.toString());
             nowProcess.setTime(nowProcess.getTime() + 1);
+            //nowProcess.setTime(clock.getTime());
             if (nowProcess.getTime() == nowProcess.getServiceTime()) {
                 //已经执行完毕
-                nowProcess.setFinishTime(clock.getTime());
-                nowProcess.setRoundTime(nowProcess.getFinishTime() - nowProcess.getSubmitTime()+1);
+                nowProcess.setFinishTime(clock.getTime()+1);
+                nowProcess.setRoundTime(nowProcess.getFinishTime() - nowProcess.getSubmitTime());
                 nowProcess.setAveRoundTime((double) nowProcess.getRoundTime() / nowProcess.getServiceTime());
                 nowProcess.setStatus('F');
-                System.out.println("\n时间：" + clock.getTime() + "|执行完毕：" + nowProcess.printResult());//所在块总是0
+                System.out.println("\n|执行完毕：" + nowProcess.printResult());//所在块总是0
                 //释放空间的占用
                 integerJobHashMap.remove(nowProcess.getID());
                 nowProcess.setTapeGet(false);
@@ -130,6 +135,7 @@ public class Scheduling {
                 nowProcess = null;
                 //todo 关键在这里,当前进程run完调用
                 processScheduling();
+
             }
         }
 
@@ -280,6 +286,18 @@ public class Scheduling {
         if (integerJobHashMap.size() >= 1 && integerBlockHashMap.size() >= 1) {
             //按作业调度顺序来分配
             int jobID;
+/*            if(nowProcess!=null){
+                System.out.println("-----当前时间: "+JOB.timeFormat(clock.getTime())+"-----");
+            }
+            else{
+                System.out.println("-----当前时间: "+JOB.timeFormat(clock.getTime()+1)+"-----");
+            }*/
+            if(nowProcess==null &&clock.getTime()!=0){
+                System.out.println("-----当前时间: "+JOB.timeFormat(clock.getTime()+1)+"-----");
+            }
+            else{
+                System.out.println("-----当前时间: "+JOB.timeFormat(clock.getTime())+"-----");
+            }
             for (int i = 0; i <= jobs1.size() - 1; i++) {
                 jobID = jobs1.get(i).getID();
                 if (integerJobHashMap.get(jobID) != null &&
@@ -290,7 +308,7 @@ public class Scheduling {
                     Block block;
 
                     JOB job = integerJobHashMap.get(jobID);
-                    System.out.println("时间：" + clock.getTime()+"选中作业：" + job.printNeed());
+                    System.out.print("选中作业：" + job.getName()+" ");
 /*                    //找到最佳适应的块
                     int bestFitBlockID = -1;
                     for (int blockID = 0; blockID <= integerBlockHashMap.size() - 1; blockID++) {
@@ -328,7 +346,7 @@ public class Scheduling {
                         tapes -= job.getTapeNeeded();
                         integerBlockHashMap.put(bestFitBlockID, block);
                         integerJobHashMap.put(jobID, job);
-                        System.out.println("时间：" + clock.getTime()+"作业调度成功：" + job.printNeed());
+                        System.out.println("作业调度【成功】：" + job.printNeed());
 
                         biggestRemainSize=0;//原来bug在这里
                         for (int blockID = 0; blockID <= integerBlockHashMap.size() - 1; blockID++) {
@@ -346,7 +364,7 @@ public class Scheduling {
                                 jobs2.add(0, nowProcess);
                                 jobs2.add(0, job);
                                 nowProcess = null;
-                                System.out.println("时间：" + clock.getTime() + "抢占成功" + job);
+                                System.out.println("抢占成功" + job.printNeed());
                             } else {
                                 jobs2.add(job);
                                 jobs2.sort((o1, o2) -> o1.getDegree() - o2.getDegree());
@@ -359,7 +377,8 @@ public class Scheduling {
                                 jobs2.add(0, nowProcess);
                                 jobs2.add(0, job);
                                 nowProcess = null;
-                                System.out.println("时间：" + clock.getTime() + "抢占成功" + job);
+                                //System.out.println("时间：" + clock.getTime() + "抢占成功" + job);
+                                System.out.println("抢占成功" + job.printNeed());
                             } else {
                                 jobs2.add(job);
                                 jobs2.sort((o1, o2) -> o1.getArriveReadyTime() - o2.getArriveReadyTime());
@@ -389,7 +408,7 @@ public class Scheduling {
                                 jobs2.add(0, nowProcess);
                                 jobs2.add(0, job);
                                 nowProcess = null;
-                                System.out.println("时间：" + clock.getTime() + "抢占成功" + job);
+                                System.out.println("抢占成功" + job.printNeed());
                             } else {
                                 //job.setReplacedTime(clock.getTime());
                                 jobs2.add(job);
@@ -397,8 +416,8 @@ public class Scheduling {
                             }
                         }
                     } else {
-                        System.out.println("时间：" + clock.getTime()+"作业调度失败：" + job.printNeed());
-                        System.out.println("时间：" + clock.getTime()+"主存空间不够or磁带机不够");
+                        System.out.println("作业调度失败：" + job.printNeed());
+                        //System.out.println("时间：" + clock.getTime()+"主存空间不够or磁带机不够");
                     }
                 }
             }
