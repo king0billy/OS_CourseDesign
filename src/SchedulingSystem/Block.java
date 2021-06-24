@@ -9,7 +9,7 @@ public class Block {
     private int startAddress;
     private int EndAddress;
     private Queue<Integer> JobIDs = new LinkedList<>();
-    private int remainSize;
+    private int remainSize;//似乎是附近的空闲空间
 
     public Block() {
 
@@ -78,9 +78,13 @@ public class Block {
     public void setRemainSize(int remainSize) {
         this.remainSize = remainSize;
     }
-
+    //todo 难用上
     @Override
     public String toString() {
+        return "BlockID:" + getID() + "|Size:" + getSize() + "|开始地址:" + getStartAddress() +
+                "|结束地址:" + getEndAddress() + "|剩余大小:" + getRemainSize() + "|作业:" + getJobIDs().toString();
+    }
+    public String printList() {
         return "BlockID:" + getID() + "|Size:" + getSize() + "|开始地址:" + getStartAddress() +
                 "|结束地址:" + getEndAddress() + "|剩余大小:" + getRemainSize() + "|作业:" + getJobIDs().toString();
     }

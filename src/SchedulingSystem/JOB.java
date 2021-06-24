@@ -219,12 +219,25 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     public void setStatus(char status) {
         this.status = status;
     }
+    public String printNeed() {
+        return "名字：" + getName() + "|提交时间：" + getSubmitTime() +
+                "\t|运行时间：" + getTime() +
+                "|状态：" + getStatus() + "|服务时间：" + getServiceTime() +
+                "|所需块大小"+getSize()+"|磁带机需求"+getTapeNeeded()+"|磁带机分配情况"+isTapeGet();
 
+    }
+    public String printResult() {
+        return "名字：" + getName() + "|提交时间:" + getSubmitTime() +
+                "\t|结束时间：" + getFinishTime() + "|运行时间：" + getTime() +
+                "|周转时间：" + getRoundTime() + "|带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
+                "|服务时间：" + getServiceTime() +
+                "|所需块大小"+getSize()+"|磁带机需求"+getTapeNeeded();
+    }
     @Override
     public String toString() {
         return "ID：" + getID() + "|名字：" + getName() + "|提交时间：" + getSubmitTime() +
-                "|结束时间：" + getFinishTime() + "|运行时间：" + getTime() +
-                "|周转时间：" + getRoundTime() + "|带权周转时间：" + getAveRoundTime() +
+                "\t|结束时间：" + getFinishTime() + "|运行时间：" + getTime() +
+                "|周转时间：" + getRoundTime() + "|带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
                 "|状态：" + getStatus() + "|服务时间：" + getServiceTime() + "|所在的块" + getBlockID()+
                 "|所需块大小"+getSize()+"|磁带机需求"+getTapeNeeded()+"|磁带机分配情况"+isTapeGet();
 
