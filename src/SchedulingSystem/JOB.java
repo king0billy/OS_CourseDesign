@@ -13,7 +13,7 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     private int serviceTime;  //服务所需要的时间
     private int submitTime;    //提交时间
     private int finishTime;   //结束服务时间
-    private int time;          //已服务时间
+    private int time=0;          //已服务时间
     private int roundTime;    //周转时间
     private double aveRoundTime; //带权周转时间
     private int source;        //所需磁带机资源
@@ -22,6 +22,15 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     private double hrrfRate;   //最高响应比//没有用
 
     private int arriveReadyTime=99999999;
+/*    private int replacedTime=9999;
+
+    public int getReplacedTime() {
+        return replacedTime;
+    }
+
+    public void setReplacedTime(int replacedTime) {
+        this.replacedTime = replacedTime;
+    }*/
 
     public int getArriveReadyTime() {
         return arriveReadyTime;
@@ -51,7 +60,10 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
         setBlockID(-1);
         setStatus('W');
     }
-
+    public JOB(String name, int arrive, int serviceTime, int size, int tape, int degree) {
+        this(name,arrive,serviceTime,size,tape);
+        this.setDegree(degree);
+    }
     @Override
     protected Object clone() throws CloneNotSupportedException {
         JOB job = null;

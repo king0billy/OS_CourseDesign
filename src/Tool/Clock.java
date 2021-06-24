@@ -47,6 +47,7 @@ public class Clock {
 
     public void goOneTime(){
         if(run) {
+            //todo 有点像配置文件
             changeSupport.firePropertyChange("time", getTime(), getTime() + 1);
             changeSupport2.firePropertyChange("time",getTime(),getTime()+1);
             setTime(getTime() + 1);
