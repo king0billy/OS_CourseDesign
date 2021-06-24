@@ -77,7 +77,7 @@ public class Scheduling {
         /**
          * 进程执行一个时间单位 short process fist
          */
-        private void SPF() {
+        private void processRunning1Second() {
             if (nowProcess == null) {
                 if (jobs2.size() != 0) {
                     if(processChoice==3){ //进程高响应比的ReplacedTime换成ArriveReadyTime因为是非抢占 HRRN
@@ -122,13 +122,13 @@ public class Scheduling {
                 integerBlockHashMap.put(block.getID(), block);
                 for (int j = 0; j <= jobs1.size() - 1; j++) {
                     if (jobs1.get(j).getID() == nowProcess.getID()) {
-                        jobs1.remove(j);
+                        jobs1.remove(j);//jobs2已经remove过了?
                     }
                 }
                 jobs3.add(nowProcess);
                 nowProcess = null;
-                //todo 关键在这里
-                BF();
+                //todo 关键在这里,当前进程run完调用
+                processScheduling();
             }
         }
 
@@ -147,7 +147,7 @@ public class Scheduling {
                 jobs1.add(nowJob);
                 //尝试分配
                 integerJobHashMap.put(nowJob.getID(), nowJob);
-                BF();
+                processScheduling();
             }
             nowJob = null;
         }
@@ -165,7 +165,7 @@ public class Scheduling {
                 jobs1.add(nowJob);
                 //尝试分配
                 integerJobHashMap.put(nowJob.getID(), nowJob);
-                BF();
+                processScheduling();
             }
             nowJob = null;
         }
@@ -183,7 +183,7 @@ public class Scheduling {
                 jobs1.add(nowJob);
                 //尝试分配
                 integerJobHashMap.put(nowJob.getID(), nowJob);
-                BF();
+                processScheduling();
             }
             nowJob = null;
         }
@@ -202,7 +202,7 @@ public class Scheduling {
                 jobs1.add(nowJob);
                 //尝试分配
                 integerJobHashMap.put(nowJob.getID(), nowJob);
-                BF();
+                processScheduling();
             }
             nowJob = null;
         }
@@ -232,7 +232,7 @@ public class Scheduling {
                 SJF();
             }
 
-            SPF();
+            processRunning1Second();
         }
     }
 
@@ -250,7 +250,8 @@ public class Scheduling {
     /**
      * 最佳适应
      */
-    public void BF() {
+    public void processScheduling() {
+        //processRunning1Second当前jobs(后备)还有作业入才能了jobHashMap  &&  integerBlockHashMap是只有当前run进程结束才入的
         if (integerJobHashMap.size() >= 1 && integerBlockHashMap.size() >= 1) {
             //按作业调度顺序来分配
             int jobID;
