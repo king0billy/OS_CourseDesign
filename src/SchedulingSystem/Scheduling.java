@@ -31,6 +31,8 @@ public class Scheduling {
     }
 
     private void init() {
+        partitionNode.headNode=partitionNode.initPartition();
+
         tapes = ToolForSch.tapesTol;
         addBlock(new Block(ToolForSch.memoryTol));
         TestData();
@@ -46,11 +48,13 @@ public class Scheduling {
         addWell(new JOB("JOB3", 30, 10, 50, 3));
         addWell(new JOB("JOB4", 35, 20, 10, 2));
         addWell(new JOB("JOB5", 40, 15, 30, 2));*/
+        //第一组测试数据
 /*        addWell(new JOB("JOB1", 0, 25, 15, 2,211));
         addWell(new JOB("JOB2", 20, 30, 60, 1,222));
         addWell(new JOB("JOB3", 30, 10, 50, 3,251));
         addWell(new JOB("JOB4", 35, 20, 10, 2,255));
         addWell(new JOB("JOB5", 40, 15, 30, 2,0));*/
+        //第二组测试数据
         addWell(new JOB("JOB1", 0, 25, 15, 2,211));
         addWell(new JOB("JOB2", 20, 30, 60, 1,222));
         addWell(new JOB("JOB3", 30, 10, 10, 1,251));
@@ -199,16 +203,6 @@ public class Scheduling {
          * 作业调度 (Highest Response Ratio Next)
          */
         private void HRRN() {
-//            if (jobs.size() != 0) {
-//                int biggestRemainSize=0;
-//                Block block;
-//                for (int blockID = 0; blockID <= integerBlockHashMap.size() - 1; blockID++) {
-//                    block = integerBlockHashMap.get(blockID);
-//                    biggestRemainSize=biggestRemainSize>=block.getRemainSize()?biggestRemainSize:block.getRemainSize();
-//                }
-//                System.out.println("\n目前剩余最大内存块大小: "+biggestRemainSize+" 剩余磁带数: "+tapes);
-//                //System.out.println("时间：" + clock.getTime() + ":无作业需要调度");
-//            }
             jobs.sort((o1, o2) -> (clock.getTime()-o1.getSubmitTime()+o1.getServiceTime())/o1.getServiceTime() - 
                     (clock.getTime()-o2.getSubmitTime()+o2.getServiceTime())/o2.getServiceTime());
             for (int i = 0; i <= jobs.size() - 1; i++) {
@@ -291,9 +285,6 @@ public class Scheduling {
                         integerJobHashMap.get(jobID).getState() == 0 &&
                         !integerJobHashMap.get(jobID).isTapeGet()) {
 
-//                    int biggestRemainSize=0;
-//                    Block block;
-
                     JOB job = integerJobHashMap.get(jobID);
                     System.out.print("选中作业：" + job.getName()+" ");
 /*                    //找到最佳适应的块
@@ -344,7 +335,6 @@ public class Scheduling {
                         System.out.println("目前最大空闲内存块大小: "+biggestRemainSize+" 剩余磁带数: "+tapes);
 
                         //抢占(排好队等待调度)//todo 改这里看看 job抢占了nowProcess jobs2.add
-                        //System.out.println(jobChoice+"   "+processChoice);
                         if(processChoice==1){//PSA
                             if (nowProcess != null && job.getDegree() < nowProcess.getDegree()) {
                                 nowProcess.setStatus('W');
@@ -367,8 +357,6 @@ public class Scheduling {
                                 jobs2.add(0, job);
                                 nowProcess = null;
                                 System.out.println(job.getName()+"【抢占成功】");
-                                //System.out.println("时间：" + clock.getTime() + "抢占成功" + job);
-                                //System.out.println("抢占成功" + job.printNeed());
                             } else {
                                 jobs2.add(job);
                                 jobs2.sort((o1, o2) -> o1.getArriveReadyTime() - o2.getArriveReadyTime());
@@ -408,53 +396,11 @@ public class Scheduling {
                         }
                     } else {
                         System.out.println("作业调度失败");
-                        //System.out.println("作业调度失败：" + job.printNeed());
-                        //System.out.println("时间：" + clock.getTime()+"主存空间不够or磁带机不够");
                     }
                 }
             }
         }
     }
-    
-
-    /**
-     * 合并空间gui才用的
-     */
-    public void spaceToMerge() {
-        if (integerBlockHashMap.size() > 0) {
-            int size1 = integerBlockHashMap.size();
-            for (int blockID = 0; blockID <= size1 - 1; blockID++) {
-                if (integerBlockHashMap.get(blockID).getRemainSize() > 0) {
-                    int finalBlockID = blockID;
-                    while (finalBlockID < size1 - 1
-                            && integerBlockHashMap.get(finalBlockID + 1).getRemainSize() == integerBlockHashMap.get(finalBlockID + 1).getSize()) {
-                        finalBlockID++;
-                    }
-                    if (finalBlockID != blockID) {
-                        int size = 0;
-                        Block newBlock = new Block();
-                        newBlock.setStartAddress(integerBlockHashMap.get(blockID).getEndAddress() - integerBlockHashMap.get(blockID).getRemainSize() + 1);
-                        for (int startID = blockID; startID <= finalBlockID; startID++) {
-                            Block block = integerBlockHashMap.get(startID);
-                            size += block.getRemainSize();
-                            block.setSize(block.getSize() - block.getRemainSize());
-                            block.setRemainSize(0);
-                            integerBlockHashMap.put(block.getID(), block);
-                            if (startID == finalBlockID) {
-                                newBlock.setSize(size);
-                                newBlock.setRemainSize(size);
-                            }
-                        }
-                        newBlock.setID(integerBlockHashMap.size());
-                        newBlock.setEndAddress(newBlock.getStartAddress() + newBlock.getSize() - 1);
-                        integerBlockHashMap.put(integerBlockHashMap.size(), newBlock);
-                    }
-                    blockID = finalBlockID;
-                }
-            }
-        }
-    }
-
     /**
      * 加入块
      *
@@ -482,17 +428,14 @@ public class Scheduling {
             jobChoice=Integer.parseInt(bufferedReader.readLine());
         } catch (Exception e){
             jobChoice=4;
-            //e.printStackTrace();
         }
         System.out.println("再输入process的算法!");
         try{
             processChoice=Integer.parseInt(bufferedReader.readLine());
         } catch (Exception e){
             processChoice=4;
-            //e.printStackTrace();
         }
         System.out.println("jobChoice= "+jobChoice+" "+"processChoice= "+processChoice);
-//        jobChoice=2;processChoice=2;
         new Scheduling().run();
     }
 }

@@ -28,7 +28,7 @@ public class partitionNode {
         pointer.startingAddress = 0;
         pointer.size = MAXSIZE;
         pointer.status = 0;
-        pointer.processID = -99;
+        pointer.processID =  -9;
         pointer.previous = null;
         pointer.next = null;
         return pointer;
@@ -50,7 +50,7 @@ public class partitionNode {
             newPartition.startingAddress = pointer.startingAddress + processSize;
             newPartition.size = pointer.size - processSize;
             newPartition.status = 0;
-            newPartition.processID = -99;
+            newPartition.processID =  -9;
 
             pointer.size = processSize;
             pointer.status = 1;
@@ -151,12 +151,12 @@ public class partitionNode {
                 if(nextNode.next!=null)nextNode.next.previous = pointer;
                 //todo 解决删除唯一一个分区的bug
                 pointer.status = 0;
-                pointer.processID = -99;
+                pointer.processID =  -9;
                 //free(nextNode);
             } else {
                 //不和空闲分区相连
                 pointer.status = 0;
-                pointer.processID = -99;
+                pointer.processID =  -9;
             }
         }
         return 1;
@@ -168,7 +168,7 @@ public class partitionNode {
         System.out.print("\n|分区号\t|起始地址\t|分区大小\t|分区状态\n");
 
         while (pointer!=null) {
-            System.out.print("|"+pointer.processID+"\t|"+pointer.startingAddress+"\t\t|"+pointer.size+"\t\t|");
+            System.out.print("|"+pointer.processID+"\t\t|"+pointer.startingAddress+"\t\t|"+pointer.size+"\t\t|");
             if(pointer.status==1)System.out.print("已分配");
             else System.out.print("空闲");
             System.out.print("\n");

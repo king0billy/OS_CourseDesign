@@ -267,7 +267,7 @@ public class MainGUI4 extends JFrame {
         // TODO add your code here
         //合并地址空间
         new Thread(()->{
-            scheduling.spaceToMerge();
+            //scheduling.spaceToMerge();
             renew1();
         }).start();
     }
