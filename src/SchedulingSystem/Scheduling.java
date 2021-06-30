@@ -14,7 +14,7 @@ public class Scheduling {
     public List<JOB> jobs = new ArrayList<>(); //后备队列//没能进入内存(就绪队列的)
     public List<JOB> jobs1 = new ArrayList<>();    //未完成作业队列（保存着作业调度后的顺序）
     public HashMap<Integer, JOB> integerJobHashMap = new HashMap<>();//作业队列的内存块分配情况(会被取走)
-    public HashMap<Integer, Block> integerBlockHashMap = new HashMap<>(); //块的情况表
+    //public HashMap<Integer, Block> integerBlockHashMap = new HashMap<>(); //块的情况表
     public List<JOB> jobs2 = new ArrayList<>();  //分配资源块后的就绪队列（会被取走）
     public int tapes;//磁带机
     public List<JOB> jobs3 = new ArrayList<>(); //进程调度后的结果（最终结果）
@@ -34,7 +34,7 @@ public class Scheduling {
         partitionNode.headNode=partitionNode.initPartition();
 
         tapes = ToolForSch.tapesTol;
-        addBlock(new Block(ToolForSch.memoryTol));
+        //addBlock(new Block(ToolForSch.memoryTol));
         TestData();
         for(int i=0;i< well.size();i++){
             System.out.println(well.get(i).printNeed());
@@ -136,13 +136,18 @@ public class Scheduling {
                 integerJobHashMap.remove(nowProcess.getID());
                 nowProcess.setTapeGet(false);
                 tapes += nowProcess.getTapeNeeded();
-                Block block = integerBlockHashMap.get(nowProcess.getBlockID());
-                Queue<Integer> queue = block.getJobIDs();
-                queue.remove(nowProcess.getID());
-                block.setJobIDs(queue);
-                //todo 这里移动了作业!
-                block.setRemainSize(block.getRemainSize() + nowProcess.getSize());
-                integerBlockHashMap.put(block.getID(), block);
+
+                partitionNode.freeAllocation(nowProcess.getID());
+                partitionNode.displayAllocation();
+                partitionNode.allocateResult=1;
+
+//                Block block = integerBlockHashMap.get(nowProcess.getBlockID());
+//                Queue<Integer> queue = block.getJobIDs();
+//                queue.remove(nowProcess.getID());
+//                block.setJobIDs(queue);
+//                //todo 这里移动了作业!
+//                block.setRemainSize(block.getRemainSize() + nowProcess.getSize());
+//                integerBlockHashMap.put(block.getID(), block);
                 for (int j = 0; j <= jobs1.size() - 1; j++) {
                     if (jobs1.get(j).getID() == nowProcess.getID()) {
                         jobs1.remove(j);//jobs2已经remove过了?
@@ -165,6 +170,9 @@ public class Scheduling {
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
+for(int j=0;j<jobs1.size();j++){
+    System.out.println("shitshit!!!!!"+jobs1.get(j).getName());
+}
                 //尝试分配
                 integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
@@ -261,7 +269,7 @@ public class Scheduling {
     public void processScheduling() {
         //processRunning1Second当前jobs(后备)还有作业入才能了jobHashMap  &&  integerBlockHashMap是只有当前run进程结束才入的
 
-        if (integerJobHashMap.size() >= 1 && integerBlockHashMap.size() >= 1) {
+        if (integerJobHashMap.size() >= 1 && partitionNode.allocateResult >= 1) {
             //按作业调度顺序来分配
             int jobID;
             if(nowProcess==null &&clock.getTime()!=0){
@@ -270,11 +278,13 @@ public class Scheduling {
             else{
                 System.out.println("********************当前时间: "+JOB.timeFormat(clock.getTime())+"********************");
             }
+
             int biggestRemainSize=0;
-            Block block;
-            for (int blockID = 0; blockID <= integerBlockHashMap.size() - 1; blockID++) {
-                block = integerBlockHashMap.get(blockID);
-                biggestRemainSize=biggestRemainSize>=block.getRemainSize()?biggestRemainSize:block.getRemainSize();
+            partitionNode temp;
+            for (temp=partitionNode.headNode;temp!=null;temp=temp.next) {
+                if(temp.processID<=0){
+                biggestRemainSize=biggestRemainSize> temp.size?biggestRemainSize:temp.size;
+                }
             }
             System.out.println("目前最大空闲内存块大小: "+biggestRemainSize+" 剩余磁带数: "+tapes);
 
@@ -302,18 +312,21 @@ public class Scheduling {
                     }*/
                     //找到首次适应的块
                     int bestFitBlockID = -1;
-                    for (int blockID = 0; blockID <= integerBlockHashMap.size() - 1; blockID++) {
-                        block = integerBlockHashMap.get(blockID);
-                        if (block.getRemainSize() - job.getSize() >= 0) {
-                                bestFitBlockID = blockID;break;
-                        }
-                    }
+//                    for (int blockID = 0; blockID <= integerBlockHashMap.size() - 1; blockID++) {
+//                        block = integerBlockHashMap.get(blockID);
+//                        if (block.getRemainSize() - job.getSize() >= 0) {
+//                                bestFitBlockID = blockID;break;
+//                        }
+//                    }
                     //操作部分
-                    if (bestFitBlockID != -1 && job.getTapeNeeded() <= tapes) {
-                        block = integerBlockHashMap.get(bestFitBlockID);
-                        block.setRemainSize(block.getRemainSize() - job.getSize());
-                        block.addaJobID(jobID);
+                    partitionNode.allocateResult=partitionNode.firstFitAllocation(job.getID(),job.getSize());
+                    if ( partitionNode.allocateResult>=1 && job.getTapeNeeded() <= tapes) {
+//                        block = integerBlockHashMap.get(bestFitBlockID);
+//                        block.setRemainSize(block.getRemainSize() - job.getSize());
+//                        block.addaJobID(jobID);
                         //todo 成功分配到全部资源
+
+                        partitionNode.displayAllocation();
 
                         job.setArriveReadyTime(clock.getTime());
                         //job.setReplacedTime(job.getArriveReadyTime());
@@ -322,15 +335,16 @@ public class Scheduling {
                         job.setBlockID(bestFitBlockID);
                         job.setTapeGet(true);
                         tapes -= job.getTapeNeeded();
-                        integerBlockHashMap.put(bestFitBlockID, block);
+//                        integerBlockHashMap.put(bestFitBlockID, block);
                         integerJobHashMap.put(jobID, job);
                         System.out.println("作业调度【成功】");
                         //System.out.println("作业调度【成功】：" + job.printNeed());
 
                         biggestRemainSize=0;//原来bug在这里
-                        for (int blockID = 0; blockID <= integerBlockHashMap.size() - 1; blockID++) {
-                            block = integerBlockHashMap.get(blockID);
-                            biggestRemainSize=biggestRemainSize>=block.getRemainSize()?biggestRemainSize:block.getRemainSize();
+                        for (temp=partitionNode.headNode;temp!=null;temp=temp.next) {
+                            if(temp.processID<=0){
+                                biggestRemainSize=biggestRemainSize> temp.size?biggestRemainSize:temp.size;
+                            }
                         }
                         System.out.println("目前最大空闲内存块大小: "+biggestRemainSize+" 剩余磁带数: "+tapes);
 
@@ -404,22 +418,22 @@ public class Scheduling {
     /**
      * 加入块
      *
-     * @param block
+     * @param //block
      * @return
      */
-    public boolean addBlock(Block block) {
-        if (block == null) return false;
-        if (integerBlockHashMap.size() == 0) {
-            block.setStartAddress(0);
-            block.setEndAddress(block.getSize());
-        } else {
-            block.setStartAddress(integerBlockHashMap.get(integerBlockHashMap.size() - 1).getEndAddress() + 1);
-            block.setEndAddress(block.getStartAddress() + block.getSize() - 1);
-        }
-        block.setID(integerBlockHashMap.size());
-        integerBlockHashMap.put(block.getID(), block);
-        return true;
-    }
+//    public boolean addBlock(Block block) {
+//        if (block == null) return false;
+//        if (integerBlockHashMap.size() == 0) {
+//            block.setStartAddress(0);
+//            block.setEndAddress(block.getSize());
+//        } else {
+//            block.setStartAddress(integerBlockHashMap.get(integerBlockHashMap.size() - 1).getEndAddress() + 1);
+//            block.setEndAddress(block.getStartAddress() + block.getSize() - 1);
+//        }
+//        block.setID(integerBlockHashMap.size());
+//        integerBlockHashMap.put(block.getID(), block);
+//        return true;
+//    }
     public static void main(String[] args) throws IOException {
         BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(System.in));
         System.out.println("输入1是PSA(静态priority-scheduling algorithm),2是FCFS,3是HRRN(高响应比优先High Respond Radio Next,非抢占)!其他都是S*F(Short First)");

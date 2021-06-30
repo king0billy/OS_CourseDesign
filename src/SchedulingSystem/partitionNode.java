@@ -22,6 +22,7 @@ public class partitionNode {
         partitionNode next;
 
       static partitionNode headNode;
+      static int allocateResult=1;
 
     static partitionNode initPartition() {
          partitionNode pointer = new partitionNode();//( partitionNode*)malloc(sizeof( partitionNode));
@@ -136,7 +137,7 @@ public class partitionNode {
                 //后面紧接着一个size不为0的空闲分区
                 preNode.size += nextNode.size;
                 preNode.next = nextNode.next;
-                nextNode.next.previous = preNode;
+                if(nextNode.next!=null)nextNode.next.previous = preNode;//todo 为什么这里会null
                 //free(nextNode);
             }
             //free(pointer);

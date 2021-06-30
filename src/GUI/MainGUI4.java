@@ -119,9 +119,9 @@ public class MainGUI4 extends JFrame {
     private void renew1(){
         DefaultTableModel tableModel = ((DefaultTableModel) table1.getModel());
         tableModel.getDataVector().clear();
-        for (Block block : scheduling.integerBlockHashMap.values()) {
+/*        for (Block block : scheduling.integerBlockHashMap.values()) {
             tableModel.addRow(block.toArray());
-        }
+        }*/
     }
 
     /**
@@ -232,7 +232,7 @@ public class MainGUI4 extends JFrame {
         try{
             int blockSize = Integer.parseInt(textField11.getText());
             if(blockSize>=0){
-                scheduling.addBlock(new Block(blockSize));
+                //scheduling.addBlock(new Block(blockSize));
                 renew1();
             }else {
                 JOptionPane.showMessageDialog(this, "块大小应该大于0", "警告", JOptionPane.WARNING_MESSAGE);
