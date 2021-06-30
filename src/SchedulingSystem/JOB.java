@@ -4,21 +4,21 @@ import java.io.Serializable;
 
 public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     private int ID;
-    private int size;
+    private int needSize;
     private int blockID;
     private String name;
-    private int tapeNeeded;
+    private int needTape;
     private boolean tapeGet;
     private int state;
     private int serviceTime;  //服务所需要的时间
     private int submitTime;    //提交时间
     private int finishTime;   //结束服务时间
-    private int time=0;          //已服务时间
+    private int runTime=0;          //已服务时间
     private int roundTime;    //周转时间
     private double aveRoundTime; //带权周转时间
     private int source;        //所需磁带机资源
     private char status;      //当前状态  W代表就绪 R代表正在运行 F代表完成
-    private int degree;        //优先级//没有用
+    private int priority;        //优先级//没有用
     private double hrrfRate;   //最高响应比//没有用
 
     private int arriveReadyTime=99999999;
@@ -51,18 +51,18 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     public JOB() {
     }
 
-    public JOB(String name, int arrive, int serviceTime, int size, int tape) {
+    public JOB(String name, int arriveTime, int serviceTime, int needSize, int needTape) {
         setName(name);
         setServiceTime(serviceTime);
-        setSubmitTime(arrive);
-        setSize(size);
-        setTapeNeeded(tape);
+        setSubmitTime(arriveTime);
+        setSize(needSize);
+        setTapeNeeded(needTape);
         setBlockID(-1);
         setStatus('W');
     }
-    public JOB(String name, int arrive, int serviceTime, int size, int tape, int degree) {
-        this(name,arrive,serviceTime,size,tape);
-        this.setDegree(degree);
+    public JOB(String name, int arriveTime, int serviceTime, int needSize, int needTape, int priority) {
+        this(name,arriveTime,serviceTime,needSize,needTape);
+        this.setDegree(priority);
     }
     @Override
     protected Object clone() throws CloneNotSupportedException {
@@ -72,9 +72,9 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     }
 
     public int compareTo(JOB o) {
-        if (this.degree < o.degree) {
+        if (this.priority < o.priority) {
             return -1;
-        } else if (this.degree == o.degree) {
+        } else if (this.priority == o.priority) {
             return 0;
         } else {
             return 1;
@@ -82,11 +82,11 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     }
 
     public int getTapeNeeded() {
-        return tapeNeeded;
+        return needTape;
     }
 
-    public void setTapeNeeded(int tapeNeeded) {
-        this.tapeNeeded = tapeNeeded;
+    public void setTapeNeeded(int needTape) {
+        this.needTape = needTape;
     }
 
     public boolean isTapeGet() {
@@ -98,11 +98,11 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     }
 
     public int getDegree() {
-        return degree;
+        return priority;
     }
 
-    public void setDegree(int degree) {
-        this.degree = degree;
+    public void setDegree(int priority) {
+        this.priority = priority;
     }
 
     public double getHrrfRate() {
@@ -132,11 +132,11 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     }
 
     public int getSize() {
-        return size;
+        return needSize;
     }
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setSize(int needSize) {
+        this.needSize = needSize;
     }
 
 
@@ -181,11 +181,11 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     }
 
     public int getTime() {
-        return time;
+        return runTime;
     }
 
-    public void setTime(int time) {
-        this.time = time;
+    public void setTime(int runTime) {
+        this.runTime = runTime;
     }
 
     public int getRoundTime() {
@@ -220,45 +220,45 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
         this.status = status;
     }
 /*    public String printNeed() {
-        return "" + getName() + "|提交时间：" + getSubmitTime() +
-                "\t|运行时间：" + getTime() +
-                "|状态：" + getStatus() + "|服务时间：" + getServiceTime() +
-                "|所需块大小"+getSize()+"|磁带机需求"+getTapeNeeded()+"|磁带机分配情况"+isTapeGet();
+        return "" + getName() + "  提交时间：" + getSubmitTime() +
+                "\t  运行时间：" + getTime() +
+                "  状态：" + getStatus() + "  服务时间：" + getServiceTime() +
+                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded()+"  磁带机分配情况"+isTapeGet();
 
     }
     public String printResult() {
-        return "" + getName() + "|提交时间:" + getSubmitTime() +
-                "\t|结束时间：" + getFinishTime() + "|运行时间：" + getTime() +
-                "|周转时间：" + getRoundTime() + "|带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
-                "|服务时间：" + getServiceTime() +
-                "|所需块大小"+getSize()+"|磁带机需求"+getTapeNeeded();
+        return "" + getName() + "  提交时间:" + getSubmitTime() +
+                "\t  结束时间：" + getFinishTime() + "  运行时间：" + getTime() +
+                "  周转时间：" + getRoundTime() + "  带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
+                "  服务时间：" + getServiceTime() +
+                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded();
     }*/
 public String printNeed() {
-    return "" + getName() + "|提交时间：" + timeFormat(getSubmitTime()) +
-            "\t|运行时间：" + getTime() +
-            "|状态：" + getStatus() + "|服务时间：" + getServiceTime() +
-            "|所需块大小"+getSize()+"|磁带机需求"+getTapeNeeded()+"|磁带机分配情况"+isTapeGet();
+    return "" + getName() + "  提交时间：" + timeFormat(getSubmitTime()) +
+            "\t  运行时间：" + getTime() +
+            "  状态：" + getStatus() + "\t  所需服务时间：" + getServiceTime() +
+            "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded();
 
 }
     public String printResult() {
-        return "" + getName() + "|提交时间:" + timeFormat(getSubmitTime()) +
-                "\t|结束时间：" + timeFormat(getFinishTime()) + "|运行时间：" + getTime() +
-                "|周转时间：" + getRoundTime() + "|带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
-                "|服务时间：" + getServiceTime() +
-                "|所需块大小"+getSize()+"|磁带机需求"+getTapeNeeded();
+        return "" + getName() + "  提交时间:" + timeFormat(getSubmitTime()) +
+                "\t  结束时间：" + timeFormat(getFinishTime()) + "  运行时间：" + getTime() +
+                "  周转时间：" + getRoundTime() + "  带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
+                "\t  所需服务时间：" + getServiceTime() +
+                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded();//+"  优先级数"+getDegree();
     }
-    public static String timeFormat( int time){
+    public static String timeFormat( int runTime){
         int hour=10;int min=0;
-        hour+=time/60;min=time%60;
+        hour+=runTime/60;min=runTime%60;
         return hour+":"+String.format("%02d",min);
     }
     @Override
     public String toString() {
-        return "ID：" + getID() + "|名字：" + getName() + "|提交时间：" + getSubmitTime() +
-                "\t|结束时间：" + getFinishTime() + "|运行时间：" + getTime() +
-                "|周转时间：" + getRoundTime() + "|带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
-                "|状态：" + getStatus() + "|服务时间：" + getServiceTime() + "|所在的块" + getBlockID()+
-                "|所需块大小"+getSize()+"|磁带机需求"+getTapeNeeded()+"|磁带机分配情况"+isTapeGet();
+        return "ID：" + getID() + "  名字：" + getName() + "  提交时间：" + getSubmitTime() +
+                "\t  结束时间：" + getFinishTime() + "  运行时间：" + getTime() +
+                "  周转时间：" + getRoundTime() + "  带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
+                "  状态：" + getStatus() + "  服务时间：" + getServiceTime() + "  所在的块" + getBlockID()+
+                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded()+"  磁带机分配情况"+isTapeGet();
 
     }
     public Object[] toArray(){
