@@ -165,13 +165,25 @@ public class Scheduling {
          * 作业调度 short job fist
          */
         private void SJF() {
+for(int j=0;j<jobs.size();j++){
+    System.out.println("jobs before sort!!!!!"+jobs.get(j).getName());
+}
             jobs.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
 
+for(int j=0;j<jobs.size();j++){
+    System.out.println("jobs after sort!!!!!"+jobs.get(j).getName());
+}
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
+
 for(int j=0;j<jobs1.size();j++){
-    System.out.println("shitshit!!!!!"+jobs1.get(j).getName());
+    System.out.println("jobs1 before sort!!!!!"+jobs1.get(j).getName());
+}
+                jobs1.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
+
+for(int j=0;j<jobs1.size();j++){
+    System.out.println("jobs1 after sort!!!!!"+jobs1.get(j).getName());
 }
                 //尝试分配
                 integerJobHashMap.put(nowJob.getID(), nowJob);
@@ -319,25 +331,30 @@ for(int j=0;j<jobs1.size();j++){
 //                        }
 //                    }
                     //操作部分
-                    partitionNode.allocateResult=partitionNode.firstFitAllocation(job.getID(),job.getSize());
+                    if ( job.getTapeNeeded() <= tapes){
+                        partitionNode.allocateResult=partitionNode.firstFitAllocation(job.getID(),job.getSize());
+                    }
                     if ( partitionNode.allocateResult>=1 && job.getTapeNeeded() <= tapes) {
 //                        block = integerBlockHashMap.get(bestFitBlockID);
 //                        block.setRemainSize(block.getRemainSize() - job.getSize());
 //                        block.addaJobID(jobID);
                         //todo 成功分配到全部资源
 
-                        partitionNode.displayAllocation();
+
 
                         job.setArriveReadyTime(clock.getTime());
                         //job.setReplacedTime(job.getArriveReadyTime());
 
                         job.setState(1);
+                        //todo bestFitBlockID有问题?
                         job.setBlockID(bestFitBlockID);
                         job.setTapeGet(true);
                         tapes -= job.getTapeNeeded();
 //                        integerBlockHashMap.put(bestFitBlockID, block);
                         integerJobHashMap.put(jobID, job);
                         System.out.println("作业调度【成功】");
+
+                        partitionNode.displayAllocation();
                         //System.out.println("作业调度【成功】：" + job.printNeed());
 
                         biggestRemainSize=0;//原来bug在这里
