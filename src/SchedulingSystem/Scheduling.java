@@ -13,8 +13,7 @@ public class Scheduling {
     public List<JOB> well = new ArrayList<>();//输入井
     public List<JOB> jobs = new ArrayList<>(); //后备队列//没能进入内存(就绪队列的)
     public List<JOB> jobs1 = new ArrayList<>();    //未完成作业队列（保存着作业调度后的顺序）
-    public HashMap<Integer, JOB> integerJobHashMap = new HashMap<>();//作业队列的内存块分配情况(会被取走)
-    //public HashMap<Integer, Block> integerBlockHashMap = new HashMap<>(); //块的情况表
+    //public HashMap<Integer, JOB> integerJobHashMap = new HashMap<>();//作业队列的内存块分配情况(会被取走)
     public List<JOB> jobs2 = new ArrayList<>();  //分配资源块后的就绪队列（会被取走）
     public int tapes;//磁带机
     public List<JOB> jobs3 = new ArrayList<>(); //进程调度后的结果（最终结果）
@@ -23,6 +22,7 @@ public class Scheduling {
     public Clock clock = new Clock();//系统时间
     public int jobIDNum = 0;//ID号排列
     public boolean run = false;
+    public static int totalNumber=0;
     public static int jobChoice=0;
     public static int processChoice=0;
 
@@ -36,6 +36,8 @@ public class Scheduling {
         tapes = ToolForSch.tapesTol;
         //addBlock(new Block(ToolForSch.memoryTol));
         TestData();
+        totalNumber=well.size();
+
         for(int i=0;i< well.size();i++){
             System.out.println(well.get(i).printNeed());
         }
@@ -102,7 +104,7 @@ public class Scheduling {
                     System.out.println("进程调度选择了:" + nowProcess.getName()+"\n");
                     //System.out.println("进程调度选择了:" + nowProcess.getName());
                     //System.out.println("进程调度选择了:" + nowProcess.printNeed());
-                } else if (integerJobHashMap.size() == 0 && well.size() == 0) {
+                } else if ( well.size() == 0&&totalNumber==jobs3.size()) {//integerJobHashMap.size() == 0 &&
                     System.out.println("********************当前时间: "+JOB.timeFormat(clock.getTime())+"********************");
                     System.out.println("任务完成"+"\n");
                     System.out.println("********************最终统计数据********************");
@@ -133,7 +135,7 @@ public class Scheduling {
                 //System.out.println("\n执行完毕：" + nowProcess.printResult());//所在块总是0
                 System.out.println("\n" + nowProcess.getName()+"完成,释放处理机以及相关资源");
                 //释放空间的占用
-                integerJobHashMap.remove(nowProcess.getID());
+                //integerJobHashMap.remove(nowProcess.getID());
                 nowProcess.setTapeGet(false);
                 tapes += nowProcess.getTapeNeeded();
 
@@ -141,18 +143,6 @@ public class Scheduling {
                 partitionNode.displayAllocation();
                 partitionNode.allocateResult=1;
 
-//                Block block = integerBlockHashMap.get(nowProcess.getBlockID());
-//                Queue<Integer> queue = block.getJobIDs();
-//                queue.remove(nowProcess.getID());
-//                block.setJobIDs(queue);
-//                //todo 这里移动了作业!
-//                block.setRemainSize(block.getRemainSize() + nowProcess.getSize());
-//                integerBlockHashMap.put(block.getID(), block);
-                for (int j = 0; j <= jobs1.size() - 1; j++) {
-                    if (jobs1.get(j).getID() == nowProcess.getID()) {
-                        jobs1.remove(j);//jobs2已经remove过了?
-                    }
-                }
                 jobs3.add(nowProcess);
                 nowProcess = null;
                 //todo 关键在这里,当前进程run完调用
@@ -165,28 +155,12 @@ public class Scheduling {
          * 作业调度 short job fist
          */
         private void SJF() {
-//for(int j=0;j<jobs.size();j++){
-//    System.out.println("jobs before sort!!!!!"+jobs.get(j).getName());
-//}
 //            jobs.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
-//
-//for(int j=0;j<jobs.size();j++){
-//    System.out.println("jobs after sort!!!!!"+jobs.get(j).getName());
-//}
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
-
-//for(int j=0;j<jobs1.size();j++){
-//    System.out.println("jobs1 before sort!!!!!"+jobs1.get(j).getName());
-//}
                 jobs1.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
-//
-//for(int j=0;j<jobs1.size();j++){
-//    System.out.println("jobs1 after sort!!!!!"+jobs1.get(j).getName());
-//}
-                //尝试分配
-                integerJobHashMap.put(nowJob.getID(), nowJob);
+                //integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
             }
             nowJob = null;
@@ -195,7 +169,7 @@ public class Scheduling {
          * 作业调度 first come first serve
          */
         private void FCFS() {
-            jobs.sort((o1, o2) -> o1.getSubmitTime() - o2.getSubmitTime());
+//            jobs.sort((o1, o2) -> o1.getSubmitTime() - o2.getSubmitTime());
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
@@ -203,7 +177,7 @@ public class Scheduling {
                 jobs1.sort((o1, o2) -> o1.getSubmitTime() - o2.getSubmitTime());
 
                 //尝试分配
-                integerJobHashMap.put(nowJob.getID(), nowJob);
+                //integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
             }
             nowJob = null;
@@ -212,14 +186,14 @@ public class Scheduling {
          * 作业调度 (priority-scheduling algorithm)
          */
         private void PSA() {
-            jobs.sort((o1, o2) -> o1.getDegree() - o2.getDegree());
+//            jobs.sort((o1, o2) -> o1.getDegree() - o2.getDegree());
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
                 //尝试分配
                 jobs1.sort((o1, o2) -> o1.getDegree() - o2.getDegree());
 
-                integerJobHashMap.put(nowJob.getID(), nowJob);
+                //integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
             }
             nowJob = null;
@@ -228,8 +202,8 @@ public class Scheduling {
          * 作业调度 (Highest Response Ratio Next)
          */
         private void HRRN() {
-            jobs.sort((o1, o2) -> (clock.getTime()-o1.getSubmitTime()+o1.getServiceTime())/o1.getServiceTime() - 
-                    (clock.getTime()-o2.getSubmitTime()+o2.getServiceTime())/o2.getServiceTime());
+//            jobs.sort((o1, o2) -> (clock.getTime()-o1.getSubmitTime()+o1.getServiceTime())/o1.getServiceTime() -
+//                    (clock.getTime()-o2.getSubmitTime()+o2.getServiceTime())/o2.getServiceTime());
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
@@ -237,7 +211,7 @@ public class Scheduling {
                 jobs1.sort((o1, o2) -> (clock.getTime()-o1.getSubmitTime()+o1.getServiceTime())/o1.getServiceTime() -
                         (clock.getTime()-o2.getSubmitTime()+o2.getServiceTime())/o2.getServiceTime());
 
-                integerJobHashMap.put(nowJob.getID(), nowJob);
+                //integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
             }
             nowJob = null;
@@ -289,7 +263,7 @@ public class Scheduling {
     public void processScheduling() {
         //processRunning1Second当前jobs(后备)还有作业入才能了jobHashMap  &&  integerBlockHashMap是只有当前run进程结束才入的
 
-        if (integerJobHashMap.size() >= 1 && partitionNode.allocateResult >= 1) {
+        if ( jobs1.size()>=1 && partitionNode.allocateResult >= 1) {//integerJobHashMap.size() >= 1
             //按作业调度顺序来分配
             int jobID;
             if(nowProcess==null &&clock.getTime()!=0){
@@ -311,55 +285,33 @@ public class Scheduling {
 
             for (int i = 0; i <= jobs1.size() - 1; i++) {
                 jobID = jobs1.get(i).getID();
-                if (integerJobHashMap.get(jobID) != null &&
-                        integerJobHashMap.get(jobID).getState() == 0 &&
-                        !integerJobHashMap.get(jobID).isTapeGet()) {
+//                if (integerJobHashMap.get(jobID) != null &&
+//                        integerJobHashMap.get(jobID).getState() == 0 &&
+//                        !integerJobHashMap.get(jobID).isTapeGet()) {
+//
+//                    JOB job = integerJobHashMap.get(jobID);
+                if (jobs1.get(i).getState() == 0 &&
+                        ! jobs1.get(i).isTapeGet()) {
 
-                    JOB job = integerJobHashMap.get(jobID);
+                    JOB job = jobs1.get(i);
                     System.out.print("选中作业：" + job.getName()+" ");
-/*                    //找到最佳适应的块
-                    int bestFitBlockID = -1;
-                    for (int blockID = 0; blockID <= integerBlockHashMap.size() - 1; blockID++) {
-                        Block block = integerBlockHashMap.get(blockID);
-                        if (block.getRemainSize() - job.getSize() >= 0) {
-                            if (bestFitBlockID == -1) {
-                                bestFitBlockID = blockID;
-                            }
-                            else if (block.getRemainSize() <= integerBlockHashMap.get(bestFitBlockID).getRemainSize()) {
-                                bestFitBlockID = blockID;
-                            }
-                        }
-                    }*/
-                    //找到首次适应的块
-                    int bestFitBlockID = -1;
-//                    for (int blockID = 0; blockID <= integerBlockHashMap.size() - 1; blockID++) {
-//                        block = integerBlockHashMap.get(blockID);
-//                        if (block.getRemainSize() - job.getSize() >= 0) {
-//                                bestFitBlockID = blockID;break;
-//                        }
-//                    }
-                    //操作部分
                     if ( job.getTapeNeeded() <= tapes){
                         partitionNode.allocateResult=partitionNode.firstFitAllocation(job.getID(),job.getSize());
                     }
                     if ( partitionNode.allocateResult>=1 && job.getTapeNeeded() <= tapes) {
-//                        block = integerBlockHashMap.get(bestFitBlockID);
-//                        block.setRemainSize(block.getRemainSize() - job.getSize());
-//                        block.addaJobID(jobID);
                         //todo 成功分配到全部资源
-
-
+                        jobs1.remove(i);
 
                         job.setArriveReadyTime(clock.getTime());
                         //job.setReplacedTime(job.getArriveReadyTime());
 
                         job.setState(1);
                         //todo bestFitBlockID有问题?
-                        job.setBlockID(bestFitBlockID);
+                        //job.setBlockID(bestFitBlockID);
                         job.setTapeGet(true);
                         tapes -= job.getTapeNeeded();
 //                        integerBlockHashMap.put(bestFitBlockID, block);
-                        integerJobHashMap.put(jobID, job);
+                        //integerJobHashMap.put(jobID, job);
                         System.out.println("作业调度【成功】");
 
                         partitionNode.displayAllocation();
@@ -440,25 +392,6 @@ public class Scheduling {
             }
         }
     }
-    /**
-     * 加入块
-     *
-     * @param //block
-     * @return
-     */
-//    public boolean addBlock(Block block) {
-//        if (block == null) return false;
-//        if (integerBlockHashMap.size() == 0) {
-//            block.setStartAddress(0);
-//            block.setEndAddress(block.getSize());
-//        } else {
-//            block.setStartAddress(integerBlockHashMap.get(integerBlockHashMap.size() - 1).getEndAddress() + 1);
-//            block.setEndAddress(block.getStartAddress() + block.getSize() - 1);
-//        }
-//        block.setID(integerBlockHashMap.size());
-//        integerBlockHashMap.put(block.getID(), block);
-//        return true;
-//    }
     public static void main(String[] args) throws IOException {
         BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(System.in));
         System.out.println("输入1是PSA(静态priority-scheduling algorithm),2是FCFS,3是HRRN(高响应比优先High Respond Radio Next,非抢占)!其他都是S*F(Short First)");
