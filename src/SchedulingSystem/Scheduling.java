@@ -165,26 +165,26 @@ public class Scheduling {
          * 作业调度 short job fist
          */
         private void SJF() {
-for(int j=0;j<jobs.size();j++){
-    System.out.println("jobs before sort!!!!!"+jobs.get(j).getName());
-}
-            jobs.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
-
-for(int j=0;j<jobs.size();j++){
-    System.out.println("jobs after sort!!!!!"+jobs.get(j).getName());
-}
+//for(int j=0;j<jobs.size();j++){
+//    System.out.println("jobs before sort!!!!!"+jobs.get(j).getName());
+//}
+//            jobs.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
+//
+//for(int j=0;j<jobs.size();j++){
+//    System.out.println("jobs after sort!!!!!"+jobs.get(j).getName());
+//}
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
 
-for(int j=0;j<jobs1.size();j++){
-    System.out.println("jobs1 before sort!!!!!"+jobs1.get(j).getName());
-}
+//for(int j=0;j<jobs1.size();j++){
+//    System.out.println("jobs1 before sort!!!!!"+jobs1.get(j).getName());
+//}
                 jobs1.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
-
-for(int j=0;j<jobs1.size();j++){
-    System.out.println("jobs1 after sort!!!!!"+jobs1.get(j).getName());
-}
+//
+//for(int j=0;j<jobs1.size();j++){
+//    System.out.println("jobs1 after sort!!!!!"+jobs1.get(j).getName());
+//}
                 //尝试分配
                 integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
@@ -199,6 +199,9 @@ for(int j=0;j<jobs1.size();j++){
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
+
+                jobs1.sort((o1, o2) -> o1.getSubmitTime() - o2.getSubmitTime());
+
                 //尝试分配
                 integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
@@ -214,6 +217,8 @@ for(int j=0;j<jobs1.size();j++){
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
                 //尝试分配
+                jobs1.sort((o1, o2) -> o1.getDegree() - o2.getDegree());
+
                 integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
             }
@@ -229,6 +234,9 @@ for(int j=0;j<jobs1.size();j++){
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
                 //尝试分配
+                jobs1.sort((o1, o2) -> (clock.getTime()-o1.getSubmitTime()+o1.getServiceTime())/o1.getServiceTime() -
+                        (clock.getTime()-o2.getSubmitTime()+o2.getServiceTime())/o2.getServiceTime());
+
                 integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
             }

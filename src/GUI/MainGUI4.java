@@ -4,7 +4,7 @@
 
 package GUI;
 
-import SchedulingSystem.Block;
+//import SchedulingSystem.Block;
 import SchedulingSystem.JOB;
 import SchedulingSystem.Scheduling;
 import Tool.ToolForSch;
@@ -23,9 +23,7 @@ import java.util.Vector;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.*;
 
-/**
- * @author 吴泽欣
- */
+
 public class MainGUI4 extends JFrame {
     public MainGUI4() {
         initComponents();
