@@ -5,7 +5,6 @@ import Tool.ToolForSch;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.*;
 import java.util.*;
 
@@ -13,7 +12,6 @@ public class Scheduling {
     public List<JOB> well = new ArrayList<>();//输入井
     public List<JOB> jobs = new ArrayList<>(); //后备队列//没能进入内存(就绪队列的)
     public List<JOB> jobs1 = new ArrayList<>();    //未完成作业队列（保存着作业调度后的顺序）
-    //public HashMap<Integer, JOB> integerJobHashMap = new HashMap<>();//作业队列的内存块分配情况(会被取走)
     public List<JOB> jobs2 = new ArrayList<>();  //分配资源块后的就绪队列（会被取走）
     public int tapes;//磁带机
     public List<JOB> jobs3 = new ArrayList<>(); //进程调度后的结果（最终结果）
@@ -34,7 +32,6 @@ public class Scheduling {
         partitionNode.headNode=partitionNode.initPartition();
 
         tapes = ToolForSch.tapesTol;
-        //addBlock(new Block(ToolForSch.memoryTol));
         TestData();
         totalNumber=well.size();
 
@@ -102,8 +99,6 @@ public class Scheduling {
                         nowProcess = jobs2.remove(0);
                     nowProcess.setStatus('R');
                     System.out.println("进程调度选择了:" + nowProcess.getName()+"\n");
-                    //System.out.println("进程调度选择了:" + nowProcess.getName());
-                    //System.out.println("进程调度选择了:" + nowProcess.printNeed());
                 } else if ( well.size() == 0&&totalNumber==jobs3.size()) {//integerJobHashMap.size() == 0 &&
                     System.out.println("********************当前时间: "+JOB.timeFormat(clock.getTime())+"********************");
                     System.out.println("任务完成"+"\n");
@@ -132,10 +127,8 @@ public class Scheduling {
                 nowProcess.setRoundTime(nowProcess.getFinishTime() - nowProcess.getSubmitTime());
                 nowProcess.setAveRoundTime((double) nowProcess.getRoundTime() / nowProcess.getServiceTime());
                 nowProcess.setStatus('F');
-                //System.out.println("\n执行完毕：" + nowProcess.printResult());//所在块总是0
                 System.out.println("\n" + nowProcess.getName()+"完成,释放处理机以及相关资源");
                 //释放空间的占用
-                //integerJobHashMap.remove(nowProcess.getID());
                 nowProcess.setTapeGet(false);
                 tapes += nowProcess.getTapeNeeded();
 
@@ -155,12 +148,10 @@ public class Scheduling {
          * 作业调度 short job fist
          */
         private void SJF() {
-//            jobs.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
                 jobs1.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
-                //integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
             }
             nowJob = null;
@@ -169,7 +160,6 @@ public class Scheduling {
          * 作业调度 first come first serve
          */
         private void FCFS() {
-//            jobs.sort((o1, o2) -> o1.getSubmitTime() - o2.getSubmitTime());
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
@@ -177,7 +167,6 @@ public class Scheduling {
                 jobs1.sort((o1, o2) -> o1.getSubmitTime() - o2.getSubmitTime());
 
                 //尝试分配
-                //integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
             }
             nowJob = null;
@@ -186,14 +175,11 @@ public class Scheduling {
          * 作业调度 (priority-scheduling algorithm)
          */
         private void PSA() {
-//            jobs.sort((o1, o2) -> o1.getDegree() - o2.getDegree());
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
                 //尝试分配
                 jobs1.sort((o1, o2) -> o1.getDegree() - o2.getDegree());
-
-                //integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
             }
             nowJob = null;
@@ -202,16 +188,12 @@ public class Scheduling {
          * 作业调度 (Highest Response Ratio Next)
          */
         private void HRRN() {
-//            jobs.sort((o1, o2) -> (clock.getTime()-o1.getSubmitTime()+o1.getServiceTime())/o1.getServiceTime() -
-//                    (clock.getTime()-o2.getSubmitTime()+o2.getServiceTime())/o2.getServiceTime());
             for (int i = 0; i <= jobs.size() - 1; i++) {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
                 //尝试分配
                 jobs1.sort((o1, o2) -> (clock.getTime()-o1.getSubmitTime()+o1.getServiceTime())/o1.getServiceTime() -
                         (clock.getTime()-o2.getSubmitTime()+o2.getServiceTime())/o2.getServiceTime());
-
-                //integerJobHashMap.put(nowJob.getID(), nowJob);
                 processScheduling();
             }
             nowJob = null;
@@ -261,9 +243,7 @@ public class Scheduling {
      * 最佳适应
      */
     public void processScheduling() {
-        //processRunning1Second当前jobs(后备)还有作业入才能了jobHashMap  &&  integerBlockHashMap是只有当前run进程结束才入的
-
-        if ( jobs1.size()>=1 && partitionNode.allocateResult >= 1) {//integerJobHashMap.size() >= 1
+        if ( jobs1.size()>=1 && partitionNode.allocateResult >= 1) {
             //按作业调度顺序来分配
             int jobID;
             if(nowProcess==null &&clock.getTime()!=0){
@@ -285,11 +265,6 @@ public class Scheduling {
 
             for (int i = 0; i <= jobs1.size() - 1; i++) {
                 jobID = jobs1.get(i).getID();
-//                if (integerJobHashMap.get(jobID) != null &&
-//                        integerJobHashMap.get(jobID).getState() == 0 &&
-//                        !integerJobHashMap.get(jobID).isTapeGet()) {
-//
-//                    JOB job = integerJobHashMap.get(jobID);
                 if (jobs1.get(i).getState() == 0 &&
                         ! jobs1.get(i).isTapeGet()) {
 
@@ -303,19 +278,12 @@ public class Scheduling {
                         jobs1.remove(i);
 
                         job.setArriveReadyTime(clock.getTime());
-                        //job.setReplacedTime(job.getArriveReadyTime());
-
                         job.setState(1);
-                        //todo bestFitBlockID有问题?
-                        //job.setBlockID(bestFitBlockID);
                         job.setTapeGet(true);
                         tapes -= job.getTapeNeeded();
-//                        integerBlockHashMap.put(bestFitBlockID, block);
-                        //integerJobHashMap.put(jobID, job);
                         System.out.println("作业调度【成功】");
 
                         partitionNode.displayAllocation();
-                        //System.out.println("作业调度【成功】：" + job.printNeed());
 
                         biggestRemainSize=0;//原来bug在这里
                         for (temp=partitionNode.headNode;temp!=null;temp=temp.next) {
@@ -329,12 +297,10 @@ public class Scheduling {
                         if(processChoice==1){//PSA
                             if (nowProcess != null && job.getDegree() < nowProcess.getDegree()) {
                                 nowProcess.setStatus('W');
-                                //nowProcess.setReplacedTime(clock.getTime());
                                 jobs2.add(0, nowProcess);
                                 jobs2.add(0, job);
                                 nowProcess = null;
                                 System.out.println(job.getName()+"【抢占成功】");
-                                //System.out.println("抢占成功" + job.printNeed());
                             } else {
                                 jobs2.add(job);
                                 jobs2.sort((o1, o2) -> o1.getDegree() - o2.getDegree());
@@ -343,7 +309,6 @@ public class Scheduling {
                         else if(processChoice==2){//FCFS
                             if (nowProcess != null && job.getArriveReadyTime() < nowProcess.getArriveReadyTime()) {
                                 nowProcess.setStatus('W');
-                                //nowProcess.setReplacedTime(clock.getTime());
                                 jobs2.add(0, nowProcess);
                                 jobs2.add(0, job);
                                 nowProcess = null;
@@ -353,34 +318,17 @@ public class Scheduling {
                                 jobs2.sort((o1, o2) -> o1.getArriveReadyTime() - o2.getArriveReadyTime());
                             }
                         }
-/*                        else if(processChoice==3){//HRRN
-                            if (nowProcess != null && ( clock.getTime()-job.getReplacedTime()+(job.getServiceTime()-job.getTime()) )/(job.getServiceTime()-job.getTime())
-                                    < ( clock.getTime()-nowProcess.getReplacedTime()+(nowProcess.getServiceTime()-nowProcess.getTime()) )/(nowProcess.getServiceTime()-nowProcess.getTime())) {
-//                                nowProcess.setStatus('W');
-//                                nowProcess.setReplacedTime(clock.getTime());
-//                                jobs2.add(0, nowProcess);
-//                                jobs2.add(0, job);
-//                                nowProcess = null;
-                                System.out.println("时间：" + clock.getTime() + "此方法是非抢占的!" + job);
-                            }
-//                            else {
-                                job.setReplacedTime(clock.getTime());
+                        else if(processChoice==3){//HRRN
                                 jobs2.add(job);
-                                jobs2.sort((o1, o2) ->  ( clock.getTime()-o1.getReplacedTime()+(o1.getServiceTime()-o1.getTime()) )/(o1.getServiceTime()-o1.getTime())
-                                        - (clock.getTime()-o2.getReplacedTime()+(o2.getServiceTime()-o2.getTime()) )/(o2.getServiceTime()-o2.getTime()));
-                            //}
-                        }*/
+                        }
                         else {//S*F
                             if (nowProcess != null && job.getServiceTime() -job.getTime()< nowProcess.getServiceTime() - nowProcess.getTime()) {
                                 nowProcess.setStatus('W');
-                                //nowProcess.setReplacedTime(clock.getTime());
                                 jobs2.add(0, nowProcess);
                                 jobs2.add(0, job);
                                 nowProcess = null;
                                 System.out.println(job.getName()+"【抢占成功】");
-                                //System.out.println("抢占成功" + job.printNeed());
                             } else {
-                                //job.setReplacedTime(clock.getTime());
                                 jobs2.add(job);
                                 jobs2.sort((o1, o2) -> o1.getServiceTime()-o1.getTime() - o2.getServiceTime()-o2.getTime());
                             }
