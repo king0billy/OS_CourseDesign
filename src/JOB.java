@@ -1,8 +1,4 @@
-package SchedulingSystem;
-
-import java.io.Serializable;
-
-public class JOB implements Comparable<JOB>, Cloneable, Serializable {
+public class JOB {//implements Comparable<JOB>, Cloneable, Serializable
     private int ID;
     private int needSize;
     private int blockID;
@@ -16,22 +12,10 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     private int runTime=0;          //已服务时间
     private int roundTime;    //周转时间
     private double aveRoundTime; //带权周转时间
-    private int source;        //所需磁带机资源
     private char status;      //当前状态  W代表就绪 R代表正在运行 F代表完成
     private int priority;        //优先级//没有用
-    private double hrrfRate;   //最高响应比//没有用
 
     private int arriveReadyTime=99999999;
-/*    private int replacedTime=9999;
-
-    public int getReplacedTime() {
-        return replacedTime;
-    }
-
-    public void setReplacedTime(int replacedTime) {
-        this.replacedTime = replacedTime;
-    }*/
-
     public int getArriveReadyTime() {
         return arriveReadyTime;
     }
@@ -104,24 +88,6 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     public void setDegree(int priority) {
         this.priority = priority;
     }
-
-    public double getHrrfRate() {
-        return hrrfRate;
-    }
-
-    public void setHrrfRate(double hrrfRate) {
-        this.hrrfRate = hrrfRate;
-    }
-
-    public boolean isFirestRun() {
-        return firestRun;
-    }
-
-    public void setFirestRun(boolean firestRun) {
-        this.firestRun = firestRun;
-    }
-
-    public boolean firestRun; //是否第一次运行
 
     public int getID() {
         return ID;
@@ -204,14 +170,6 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
         this.aveRoundTime = aveRoundTime;
     }
 
-    public int getSource() {
-        return source;
-    }
-
-    public void setSource(int source) {
-        this.source = source;
-    }
-
     public char getStatus() {
         return status;
     }
@@ -219,20 +177,7 @@ public class JOB implements Comparable<JOB>, Cloneable, Serializable {
     public void setStatus(char status) {
         this.status = status;
     }
-/*    public String printNeed() {
-        return "" + getName() + "  提交时间：" + getSubmitTime() +
-                "\t  运行时间：" + getTime() +
-                "  状态：" + getStatus() + "  服务时间：" + getServiceTime() +
-                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded()+"  磁带机分配情况"+isTapeGet();
 
-    }
-    public String printResult() {
-        return "" + getName() + "  提交时间:" + getSubmitTime() +
-                "\t  结束时间：" + getFinishTime() + "  运行时间：" + getTime() +
-                "  周转时间：" + getRoundTime() + "  带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
-                "  服务时间：" + getServiceTime() +
-                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded();
-    }*/
 public String printNeed() {
     return "" + getName() + "  提交时间：" + timeFormat(getSubmitTime()) +
             "\t  运行时间：" + getTime() +
@@ -260,11 +205,5 @@ public String printNeed() {
                 "  状态：" + getStatus() + "  服务时间：" + getServiceTime() + "  所在的块" + getBlockID()+
                 "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded()+"  磁带机分配情况"+isTapeGet();
 
-    }
-    public Object[] toArray(){
-        return new Object[]{
-                getID(),getName(),getSubmitTime(),getServiceTime(),getTime(),getFinishTime(),getRoundTime(),
-                getAveRoundTime(),getStatus(),getState(),getSize(),getBlockID(),getTapeNeeded(),isTapeGet()
-        };
     }
 }

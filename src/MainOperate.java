@@ -1,18 +1,13 @@
-package SchedulingSystem;
-
-import Tool.EverySecond;
-import Tool.ToolForSch;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.util.*;
 
-public class Scheduling {
-    public List<JOB> well = new ArrayList<>();//输入井
+public class MainOperate {
+    public List<JOB> well = new ArrayList<>();//输入井,
     public List<JOB> jobs = new ArrayList<>(); //后备队列//没能进入内存(就绪队列的)
-    public List<JOB> jobs1 = new ArrayList<>();    //未完成作业队列（保存着作业调度后的顺序）
-    public List<JOB> jobs2 = new ArrayList<>();  //分配资源块后的就绪队列（会被取走）
+    public List<JOB> jobs1 = new ArrayList<>();//未完成作业队列（保存着作业调度后的顺序）
+    public List<JOB> jobs2 = new ArrayList<>();//分配资源块后的就绪队列,
     public int tapes;//磁带机
     public List<JOB> jobs3 = new ArrayList<>(); //进程调度后的结果（最终结果）
     public JOB nowJob;//当前作业
@@ -24,17 +19,15 @@ public class Scheduling {
     public static int jobChoice=0;
     public static int processChoice=0;
 
-    public Scheduling() {
+    public MainOperate() {
         init();
     }
 
     private void init() {
         BlockNode.headNode=BlockNode.initPartition();
-
-        tapes = ToolForSch.tapesTol;
+        tapes = EverySecond.tapesTol;
         TestData();
         totalNumber=well.size();
-
         for(int i=0;i< well.size();i++){
             System.out.println(well.get(i).printNeed());
         }
@@ -60,7 +53,6 @@ public class Scheduling {
         addWell(new JOB("JOB4", 35, 20, 30, 3,255));
         addWell(new JOB("JOB5", 40, 15, 30, 2,0));
     }
-
     public void run() {
         TimerThread timerThread = new TimerThread() ;
         timerThread.start();
@@ -74,7 +66,7 @@ public class Scheduling {
         public void run() {
             run = true;
             while (run) {
-                ToolForSch.Sleep(ToolForSch.unitOfTime);
+                EverySecond.Sleep(EverySecond.unitOfTime);
                 everySecond.goOneTime();
             }
         }
@@ -105,7 +97,6 @@ public class Scheduling {
                     System.out.println("********************最终统计数据********************");
                     jobs3.sort(((o1, o2) ->o1.getID()-o2.getID()));
                     double averageTime=0.0f;
-                    //System.out.println("提交时间\t结束时间\t运行时间\t周转时间\t带权周转时间\t");
                     for(int i=0;i<=jobs3.size()-1;i++){
                         System.out.println(jobs3.get(i).printResult());
                         averageTime+=jobs3.get(i).getAveRoundTime();
@@ -223,7 +214,6 @@ public class Scheduling {
             else {
                 SJF();
             }
-
             processRunning1Second();
         }
     }
@@ -245,7 +235,6 @@ public class Scheduling {
     public void processScheduling() {
         if ( jobs1.size()>=1 && BlockNode.allocateResult >= 1) {
             //按作业调度顺序来分配
-            int jobID;
             if(nowProcess==null &&everySecond.getTime()!=0){
                 System.out.println("********************当前时间: "+JOB.timeFormat(everySecond.getTime()+1)+"********************");
             }
@@ -264,7 +253,6 @@ public class Scheduling {
 
 
             for (int i = 0; i <= jobs1.size() - 1; i++) {
-                jobID = jobs1.get(i).getID();
                 if (jobs1.get(i).getState() == 0 &&
                         ! jobs1.get(i).isTapeGet()) {
 
@@ -356,6 +344,6 @@ public class Scheduling {
             processChoice=4;
         }
         System.out.println("jobChoice= "+jobChoice+" "+"processChoice= "+processChoice);
-        new Scheduling().run();
+        new MainOperate().run();
     }
 }

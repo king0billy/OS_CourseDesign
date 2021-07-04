@@ -1,5 +1,3 @@
-package SchedulingSystem;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -263,8 +261,6 @@ public class BlockNode {
     void bestFitAllocationControl() {
         inputControl(bestFitAllocation);
     }
-
-
 
     void selectAlgorithm() {
         //system("cls");
