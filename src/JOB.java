@@ -1,21 +1,19 @@
 public class JOB {//implements Comparable<JOB>, Cloneable, Serializable
-    private int ID;
-    private int needSize;
-    private int blockID;
-    private String name;
-    private int needTape;
-    private boolean tapeGet;
-    private int state;
-    private int serviceTime;  //服务所需要的时间
+    private int ID;//作业id
+    private int needSize; //需要的磁带数
+    private String name;//作业名字
+    private int needTape;//需要的磁带数
+    private boolean isOccurTape; //表示当前进程是否分配到磁带机
+    private int needTime;  //服务所需要的时间
     private int submitTime;    //提交时间
     private int finishTime;   //结束服务时间
     private int runTime=0;          //已服务时间
     private int roundTime;    //周转时间
-    private double aveRoundTime; //带权周转时间
-    private char status;      //当前状态  W代表就绪 R代表正在运行 F代表完成
-    private int priority;        //优先级//没有用
+    private double averageRoundTime; //带权周转时间
+    private char status;      //当前状态  W代表waiting R代表running F代表finished
+    private int priority;        //优先级
+    private int arriveReadyTime=99999999;//成功作业调度进入内存的时间
 
-    private int arriveReadyTime=99999999;
     public int getArriveReadyTime() {
         return arriveReadyTime;
     }
@@ -24,28 +22,19 @@ public class JOB {//implements Comparable<JOB>, Cloneable, Serializable
         this.arriveReadyTime = arriveReadyTime;
     }
 
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
     public JOB() {
     }
 
-    public JOB(String name, int arriveTime, int serviceTime, int needSize, int needTape) {
+    public JOB(String name, int arriveTime, int needTime, int needSize, int needTape) {
         setName(name);
-        setServiceTime(serviceTime);
+        setServiceTime(needTime);
         setSubmitTime(arriveTime);
         setSize(needSize);
         setTapeNeeded(needTape);
-        setBlockID(-1);
         setStatus('W');
     }
-    public JOB(String name, int arriveTime, int serviceTime, int needSize, int needTape, int priority) {
-        this(name,arriveTime,serviceTime,needSize,needTape);
+    public JOB(String name, int arriveTime, int needTime, int needSize, int needTape, int priority) {
+        this(name,arriveTime,needTime,needSize,needTape);
         this.setDegree(priority);
     }
     @Override
@@ -74,11 +63,11 @@ public class JOB {//implements Comparable<JOB>, Cloneable, Serializable
     }
 
     public boolean isTapeGet() {
-        return tapeGet;
+        return isOccurTape;
     }
 
-    public void setTapeGet(boolean tapeGet) {
-        this.tapeGet = tapeGet;
+    public void setTapeGet(boolean isOccurTape) {
+        this.isOccurTape = isOccurTape;
     }
 
     public int getDegree() {
@@ -105,15 +94,6 @@ public class JOB {//implements Comparable<JOB>, Cloneable, Serializable
         this.needSize = needSize;
     }
 
-
-    public int getBlockID() {
-        return blockID;
-    }
-
-    public void setBlockID(int blockID) {
-        this.blockID = blockID;
-    }
-
     public String getName() {
         return name;
     }
@@ -123,11 +103,11 @@ public class JOB {//implements Comparable<JOB>, Cloneable, Serializable
     }
 
     public int getServiceTime() {
-        return serviceTime;
+        return needTime;
     }
 
-    public void setServiceTime(int serviceTime) {
-        this.serviceTime = serviceTime;
+    public void setServiceTime(int needTime) {
+        this.needTime = needTime;
     }
 
     public int getSubmitTime() {
@@ -163,11 +143,11 @@ public class JOB {//implements Comparable<JOB>, Cloneable, Serializable
     }
 
     public double getAveRoundTime() {
-        return aveRoundTime;
+        return averageRoundTime;
     }
 
-    public void setAveRoundTime(double aveRoundTime) {
-        this.aveRoundTime = aveRoundTime;
+    public void setAveRoundTime(double averageRoundTime) {
+        this.averageRoundTime = averageRoundTime;
     }
 
     public char getStatus() {
@@ -197,13 +177,13 @@ public String printNeed() {
         hour+=runTime/60;min=runTime%60;
         return hour+":"+String.format("%02d",min);
     }
-    @Override
-    public String toString() {
-        return "ID：" + getID() + "  名字：" + getName() + "  提交时间：" + getSubmitTime() +
-                "\t  结束时间：" + getFinishTime() + "  运行时间：" + getTime() +
-                "  周转时间：" + getRoundTime() + "  带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
-                "  状态：" + getStatus() + "  服务时间：" + getServiceTime() + "  所在的块" + getBlockID()+
-                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded()+"  磁带机分配情况"+isTapeGet();
-
-    }
+//    @Override
+//    public String toString() {
+//        return "ID：" + getID() + "  名字：" + getName() + "  提交时间：" + getSubmitTime() +
+//                "\t  结束时间：" + getFinishTime() + "  运行时间：" + getTime() +
+//                "  周转时间：" + getRoundTime() + "  带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
+//                "  状态：" + getStatus() + "  服务时间：" + getServiceTime() + //"  所在的块" + getBlockID()+
+//                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded()+"  磁带机分配情况"+isTapeGet();
+//
+//    }
 }

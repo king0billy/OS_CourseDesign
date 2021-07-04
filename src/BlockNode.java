@@ -118,7 +118,6 @@ public class BlockNode {
             return 0;
         }
 
-
         if (pointer != headNode && pointer.previous.status == 0 &&
                 pointer.previous.startingAddress + pointer.previous.size == pointer.startingAddress) {
             //前面紧接着一个size不为0的空闲分区
@@ -217,71 +216,8 @@ public class BlockNode {
         }while(T.equals("9")==false);
     }
 
-//    void inputControl(int (*allocateAlgorithm)(int,int)) {
-//        //传入的参数是一个函数
-//        char T[5];
-//        do{
-//            System.out.print("申请按 1 释放按 2 退出按 9\n");
-//            scanf("%s", T);
-//            if (T[0] == '1') {
-//                int processID, size;
-//                System.out.print("输入要申请空间的作业id: ");
-//                scanf("%d", &processID );
-//                System.out.print("输入大小: ");
-//                scanf("%d", &size);
-//                int allocateResult = allocateAlgorithm(processID, size);
-//                if (allocateResult) {
-//                    System.out.print("申请成功");
-//                    displayAllocation();
-//                }
-//                else {
-//                    System.out.print("\n内存不足 申请失败\n\n");
-//                }
-//            } else{
-//                if (T[0] == '2') {
-//                    int processID;
-//                    System.out.print("输入要释放空间的作业id: ");scanf("%d", &processID);
-//                    int allocateResult = freeAllocation(processID);
-//                    if (allocateResult) {
-//                        System.out.print("释放成功");
-//                        displayAllocation();
-//                    } else {
-//                        System.out.print("未找到相关作业，释放失败\n\n");
-//                    }
-//                }
-//            }
-//        }while(T[0]!='9');
+//    public static void main(String[] args) throws IOException {
+//        headNode = initPartition();
+//        inputControl();
 //    }
-
-
-/*    void firstFitAllocationControl() {
-        inputControl(firstFitAllocation);
-    }
-
-    void bestFitAllocationControl() {
-        inputControl(bestFitAllocation);
-    }
-
-    void selectAlgorithm() {
-        //system("cls");
-        System.out.print("按1_首次适应算法                ");
-        System.out.print("按2_最佳适应算法             \n");
-        char op[20];
-        scanf("%s", op);
-        if (!strcmp(op, "1"))
-            firstFitAllocationControl();
-        else if (!strcmp(op, "2"))
-            bestFitAllocationControl();
-    }
-
-      int main()
-    {
-        headNode = initPartition();
-        selectAlgorithm();
-        return 0;
-    }*/
-    public static void main(String[] args) throws IOException {
-        headNode = initPartition();
-        inputControl();
-    }
 }
