@@ -36,20 +36,5 @@ public class EveryMinute {
             setTime(getTime() + 1);
         }
     }
-//    static class TimeChangeListener implements PropertyChangeListener{
-//        @Override
-//        public void propertyChange(PropertyChangeEvent evt) {
-//            System.out.println(evt.getNewValue());
-//        }
-//    }
-
-//    public static void main(String[] args) {
-//        EveryMinute everySecond = new EveryMinute();
-//        everySecond.addPropertyChangeListener(new TimeChangeListener());
-//        while (true) {
-//            EveryMinute.Sleep(EveryMinute.milliOf1Minute);
-//            everySecond.goOneTime();
-//        }
-//    }
 }
 

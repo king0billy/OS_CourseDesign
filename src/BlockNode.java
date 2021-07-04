@@ -11,16 +11,15 @@ import java.io.InputStreamReader;
  * @since version-0.0
  */
 public class BlockNode {
-    final static  int MAXSIZE= 100;
-          int processID;
-          int status;
-          int startingAddress;
-          int size;
-        BlockNode previous;
-        BlockNode next;
-
-      static BlockNode headNode;
-      static int allocateResult=1;
+        final static  int MAXSIZE= 100;//内存空间最大值
+        int processID;//占用内存块的作业id
+        int status;//作业运行状态
+        int startingAddress;//起始地址
+        int size;//进程占用大小
+        BlockNode previous;//指向前一个节点的引用
+        BlockNode next;//指向都一个节点的引用
+        static BlockNode headNode;
+        static int allocateResult=1;
 
     static BlockNode initPartition() {
          BlockNode pointer = new BlockNode();//( BlockNode*)malloc(sizeof( BlockNode));
@@ -174,50 +173,4 @@ public class BlockNode {
         }
         System.out.print("\n");
     }
-    static void inputControl() throws IOException {
-        //传入的参数是一个函数
-        //char T[5];
-        BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(System.in));
-        String T;
-        do{
-            System.out.print("申请按 1 释放按 2 退出按 9\n");
-            T=bufferedReader.readLine();//scanf("%s", T);
-            if (T.equals("1")) {
-                int processID, size;
-                System.out.print("输入要申请空间的作业id: ");
-                processID=Integer.parseInt(bufferedReader.readLine());
-                //scanf("%d", &processID );
-                System.out.print("输入大小: ");
-                size=Integer.parseInt(bufferedReader.readLine());
-                //scanf("%d", &size);
-                int allocateResult = firstFitAllocation(processID, size);
-                if (allocateResult>=1) {
-                    System.out.print("申请成功");
-                    displayAllocation();
-                }
-                else {
-                    System.out.print("\n内存不足 申请失败\n\n");
-                }
-            } else{
-                if (T.equals("2")) {
-                    int processID;
-                    System.out.print("输入要释放空间的作业id: ");
-                    processID=Integer.parseInt(bufferedReader.readLine());
-                    //scanf("%d", &processID);
-                    int allocateResult = freeAllocation(processID);
-                    if (allocateResult>=1) {
-                        System.out.print("释放成功");
-                        displayAllocation();
-                    } else {
-                        System.out.print("未找到相关作业，释放失败\n\n");
-                    }
-                }
-            }
-        }while(T.equals("9")==false);
-    }
-
-//    public static void main(String[] args) throws IOException {
-//        headNode = initPartition();
-//        inputControl();
-//    }
 }

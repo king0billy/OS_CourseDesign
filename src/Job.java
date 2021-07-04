@@ -1,4 +1,4 @@
-public class JOB {//implements Comparable<JOB>, Cloneable, Serializable
+public class Job {
     private int ID;//作业id
     private int needSize; //需要的磁带数
     private String name;//作业名字
@@ -22,10 +22,10 @@ public class JOB {//implements Comparable<JOB>, Cloneable, Serializable
         this.arriveReadyTime = arriveReadyTime;
     }
 
-    public JOB() {
+    public Job() {
     }
 
-    public JOB(String name, int arriveTime, int needTime, int needSize, int needTape) {
+    public Job(String name, int arriveTime, int needTime, int needSize, int needTape) {
         setName(name);
         setServiceTime(needTime);
         setSubmitTime(arriveTime);
@@ -33,18 +33,18 @@ public class JOB {//implements Comparable<JOB>, Cloneable, Serializable
         setTapeNeeded(needTape);
         setStatus('W');
     }
-    public JOB(String name, int arriveTime, int needTime, int needSize, int needTape, int priority) {
+    public Job(String name, int arriveTime, int needTime, int needSize, int needTape, int priority) {
         this(name,arriveTime,needTime,needSize,needTape);
         this.setDegree(priority);
     }
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        JOB job = null;
-        job = (JOB) super.clone();
+        Job job = null;
+        job = (Job) super.clone();
         return job;
     }
 
-    public int compareTo(JOB o) {
+    public int compareTo(Job o) {
         if (this.priority < o.priority) {
             return -1;
         } else if (this.priority == o.priority) {
@@ -177,13 +177,4 @@ public String printNeed() {
         hour+=runTime/60;min=runTime%60;
         return hour+":"+String.format("%02d",min);
     }
-//    @Override
-//    public String toString() {
-//        return "ID：" + getID() + "  名字：" + getName() + "  提交时间：" + getSubmitTime() +
-//                "\t  结束时间：" + getFinishTime() + "  运行时间：" + getTime() +
-//                "  周转时间：" + getRoundTime() + "  带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
-//                "  状态：" + getStatus() + "  服务时间：" + getServiceTime() + //"  所在的块" + getBlockID()+
-//                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded()+"  磁带机分配情况"+isTapeGet();
-//
-//    }
 }
