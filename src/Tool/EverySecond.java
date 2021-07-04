@@ -4,11 +4,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-public class Clock {
+public class EverySecond {
     private int time;
     private boolean run;
 
-    public Clock(){
+    public EverySecond(){
         run = true;
     }
 
@@ -63,11 +63,11 @@ public class Clock {
     }
 
     public static void main(String[] args) {
-        Clock clock = new Clock();
-        clock.addPropertyChangeListener(new TimeChangeListener());
+        EverySecond everySecond = new EverySecond();
+        everySecond.addPropertyChangeListener(new TimeChangeListener());
         while (true) {
             ToolForSch.Sleep(ToolForSch.unitOfTime);
-            clock.goOneTime();
+            everySecond.goOneTime();
         }
     }
 }

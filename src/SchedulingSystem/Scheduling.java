@@ -1,6 +1,6 @@
 package SchedulingSystem;
 
-import Tool.Clock;
+import Tool.EverySecond;
 import Tool.ToolForSch;
 
 import java.beans.PropertyChangeEvent;
@@ -17,7 +17,7 @@ public class Scheduling {
     public List<JOB> jobs3 = new ArrayList<>(); //进程调度后的结果（最终结果）
     public JOB nowJob;//当前作业
     public JOB nowProcess;//当前进程
-    public Clock clock = new Clock();//系统时间
+    public EverySecond everySecond = new EverySecond();//系统时间
     public int jobIDNum = 0;//ID号排列
     public boolean run = false;
     public static int totalNumber=0;
@@ -29,7 +29,7 @@ public class Scheduling {
     }
 
     private void init() {
-        partitionNode.headNode=partitionNode.initPartition();
+        BlockNode.headNode=BlockNode.initPartition();
 
         tapes = ToolForSch.tapesTol;
         TestData();
@@ -38,7 +38,7 @@ public class Scheduling {
         for(int i=0;i< well.size();i++){
             System.out.println(well.get(i).printNeed());
         }
-        clock.addPropertyChangeListener(new TimerListener());
+        everySecond.addPropertyChangeListener(new TimerListener());
     }
 
     private void TestData() {
@@ -75,7 +75,7 @@ public class Scheduling {
             run = true;
             while (run) {
                 ToolForSch.Sleep(ToolForSch.unitOfTime);
-                clock.goOneTime();
+                everySecond.goOneTime();
             }
         }
     }
@@ -93,14 +93,14 @@ public class Scheduling {
                 if (jobs2.size() != 0) {
                     if(processChoice==3){ //进程高响应比的ReplacedTime换成ArriveReadyTime因为是非抢占 HRRN
                         System.out.println("进程调度高响应比");
-                        jobs2.sort((o1, o2) ->  ( clock.getTime()-o1.getArriveReadyTime()+(o1.getServiceTime()-o1.getTime()) )/(o1.getServiceTime()-o1.getTime())
-                                - (clock.getTime()-o2.getArriveReadyTime()+(o2.getServiceTime()-o2.getTime()) )/(o2.getServiceTime()-o2.getTime()));
+                        jobs2.sort((o1, o2) ->  ( everySecond.getTime()-o1.getArriveReadyTime()+(o1.getServiceTime()-o1.getTime()) )/(o1.getServiceTime()-o1.getTime())
+                                - (everySecond.getTime()-o2.getArriveReadyTime()+(o2.getServiceTime()-o2.getTime()) )/(o2.getServiceTime()-o2.getTime()));
                     }
                         nowProcess = jobs2.remove(0);
                     nowProcess.setStatus('R');
                     System.out.println("进程调度选择了:" + nowProcess.getName()+"\n");
                 } else if ( well.size() == 0&&totalNumber==jobs3.size()) {//integerJobHashMap.size() == 0 &&
-                    System.out.println("********************当前时间: "+JOB.timeFormat(clock.getTime())+"********************");
+                    System.out.println("********************当前时间: "+JOB.timeFormat(everySecond.getTime())+"********************");
                     System.out.println("任务完成"+"\n");
                     System.out.println("********************最终统计数据********************");
                     jobs3.sort(((o1, o2) ->o1.getID()-o2.getID()));
@@ -114,16 +114,16 @@ public class Scheduling {
                     run = false;
                     return;
                 } else {
-                    System.out.println("时间：" + clock.getTime() + "  无进程可调度");
+                    System.out.println("时间：" + everySecond.getTime() + "  无进程可调度");
                     return;
                 }
             }
-            //todo System.out.println("时间：" + clock.getTime() + "  正在执行：" + nowProcess.toString());
+            //todo System.out.println("时间：" + everySecond.getTime() + "  正在执行：" + nowProcess.toString());
             nowProcess.setTime(nowProcess.getTime() + 1);
-            //nowProcess.setTime(clock.getTime());
+            //nowProcess.setTime(everySecond.getTime());
             if (nowProcess.getTime() == nowProcess.getServiceTime()) {
                 //已经执行完毕
-                nowProcess.setFinishTime(clock.getTime()+1);
+                nowProcess.setFinishTime(everySecond.getTime()+1);
                 nowProcess.setRoundTime(nowProcess.getFinishTime() - nowProcess.getSubmitTime());
                 nowProcess.setAveRoundTime((double) nowProcess.getRoundTime() / nowProcess.getServiceTime());
                 nowProcess.setStatus('F');
@@ -132,9 +132,9 @@ public class Scheduling {
                 nowProcess.setTapeGet(false);
                 tapes += nowProcess.getTapeNeeded();
 
-                partitionNode.freeAllocation(nowProcess.getID());
-                partitionNode.displayAllocation();
-                partitionNode.allocateResult=1;
+                BlockNode.freeAllocation(nowProcess.getID());
+                BlockNode.displayAllocation();
+                BlockNode.allocateResult=1;
 
                 jobs3.add(nowProcess);
                 nowProcess = null;
@@ -192,8 +192,8 @@ public class Scheduling {
                 nowJob = jobs.remove(0);
                 jobs1.add(nowJob);
                 //尝试分配
-                jobs1.sort((o1, o2) -> (clock.getTime()-o1.getSubmitTime()+o1.getServiceTime())/o1.getServiceTime() -
-                        (clock.getTime()-o2.getSubmitTime()+o2.getServiceTime())/o2.getServiceTime());
+                jobs1.sort((o1, o2) -> (everySecond.getTime()-o1.getSubmitTime()+o1.getServiceTime())/o1.getServiceTime() -
+                        (everySecond.getTime()-o2.getSubmitTime()+o2.getServiceTime())/o2.getServiceTime());
                 processScheduling();
             }
             nowJob = null;
@@ -203,7 +203,7 @@ public class Scheduling {
          */
         private void jobArrive() {
             for (int i = 0; i <= well.size() - 1; i++) {
-                if (well.get(i).getSubmitTime() == clock.getTime()) {
+                if (well.get(i).getSubmitTime() == everySecond.getTime()) {
                     jobs.add(well.remove(i));
                     i--;
                 }
@@ -243,19 +243,19 @@ public class Scheduling {
      * 最佳适应
      */
     public void processScheduling() {
-        if ( jobs1.size()>=1 && partitionNode.allocateResult >= 1) {
+        if ( jobs1.size()>=1 && BlockNode.allocateResult >= 1) {
             //按作业调度顺序来分配
             int jobID;
-            if(nowProcess==null &&clock.getTime()!=0){
-                System.out.println("********************当前时间: "+JOB.timeFormat(clock.getTime()+1)+"********************");
+            if(nowProcess==null &&everySecond.getTime()!=0){
+                System.out.println("********************当前时间: "+JOB.timeFormat(everySecond.getTime()+1)+"********************");
             }
             else{
-                System.out.println("********************当前时间: "+JOB.timeFormat(clock.getTime())+"********************");
+                System.out.println("********************当前时间: "+JOB.timeFormat(everySecond.getTime())+"********************");
             }
 
             int biggestRemainSize=0;
-            partitionNode temp;
-            for (temp=partitionNode.headNode;temp!=null;temp=temp.next) {
+            BlockNode temp;
+            for (temp=BlockNode.headNode;temp!=null;temp=temp.next) {
                 if(temp.processID<=0){
                 biggestRemainSize=biggestRemainSize> temp.size?biggestRemainSize:temp.size;
                 }
@@ -271,22 +271,22 @@ public class Scheduling {
                     JOB job = jobs1.get(i);
                     System.out.print("选中作业：" + job.getName()+" ");
                     if ( job.getTapeNeeded() <= tapes){
-                        partitionNode.allocateResult=partitionNode.firstFitAllocation(job.getID(),job.getSize());
+                        BlockNode.allocateResult=BlockNode.firstFitAllocation(job.getID(),job.getSize());
                     }
-                    if ( partitionNode.allocateResult>=1 && job.getTapeNeeded() <= tapes) {
+                    if ( BlockNode.allocateResult>=1 && job.getTapeNeeded() <= tapes) {
                         //todo 成功分配到全部资源
                         jobs1.remove(i);
 
-                        job.setArriveReadyTime(clock.getTime());
+                        job.setArriveReadyTime(everySecond.getTime());
                         job.setState(1);
                         job.setTapeGet(true);
                         tapes -= job.getTapeNeeded();
                         System.out.println("作业调度【成功】");
 
-                        partitionNode.displayAllocation();
+                        BlockNode.displayAllocation();
 
                         biggestRemainSize=0;//原来bug在这里
-                        for (temp=partitionNode.headNode;temp!=null;temp=temp.next) {
+                        for (temp=BlockNode.headNode;temp!=null;temp=temp.next) {
                             if(temp.processID<=0){
                                 biggestRemainSize=biggestRemainSize> temp.size?biggestRemainSize:temp.size;
                             }

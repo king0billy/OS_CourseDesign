@@ -12,20 +12,20 @@ import java.io.InputStreamReader;
  * @Date: 2021/6/30 21:38
  * @since version-0.0
  */
-public class partitionNode {
+public class BlockNode {
     final static  int MAXSIZE= 100;
           int processID;
           int status;
           int startingAddress;
           int size;
-        partitionNode previous;
-        partitionNode next;
+        BlockNode previous;
+        BlockNode next;
 
-      static partitionNode headNode;
+      static BlockNode headNode;
       static int allocateResult=1;
 
-    static partitionNode initPartition() {
-         partitionNode pointer = new partitionNode();//( partitionNode*)malloc(sizeof( partitionNode));
+    static BlockNode initPartition() {
+         BlockNode pointer = new BlockNode();//( BlockNode*)malloc(sizeof( BlockNode));
         pointer.startingAddress = 0;
         pointer.size = MAXSIZE;
         pointer.status = 0;
@@ -36,7 +36,7 @@ public class partitionNode {
     }
 
     //在链表位置p处为编号为processID，大小为processSize的作业分配空间
-    static int allocate(int processID,int processSize,  partitionNode pointer) {
+    static int allocate(int processID,int processSize,  BlockNode pointer) {
         if (pointer == null){
             //没有空闲内存了,分配失败
             return 0;
@@ -47,7 +47,7 @@ public class partitionNode {
             pointer.processID = processID;
         } else {
             //分割空闲的内存再分配
-             partitionNode newPartition = new partitionNode();//( partitionNode*)malloc(sizeof( partitionNode));
+             BlockNode newPartition = new BlockNode();//( BlockNode*)malloc(sizeof( BlockNode));
             newPartition.startingAddress = pointer.startingAddress + processSize;
             newPartition.size = pointer.size - processSize;
             newPartition.status = 0;
@@ -66,8 +66,8 @@ public class partitionNode {
 
 
     //首次适应算法
-    static partitionNode firstFitFindFreePartition(int processSize) {
-         partitionNode pointer = headNode;
+    static BlockNode firstFitFindFreePartition(int processSize) {
+         BlockNode pointer = headNode;
         while (pointer!=null) {
             if (pointer.status == 0 && pointer.size >= processSize)
                 return pointer;
@@ -84,8 +84,8 @@ public class partitionNode {
 
 
     //最佳适应算法
-    static partitionNode bestFitFindFreePartition(  int processSize) {
-         partitionNode pointer = headNode;  partitionNode minPointer = null;
+    static BlockNode bestFitFindFreePartition(  int processSize) {
+         BlockNode pointer = headNode;  BlockNode minPointer = null;
          int minSize = MAXSIZE + 1;
         while (pointer!=null) {
             if (pointer.status == 0 && pointer.size >= processSize) {
@@ -107,7 +107,7 @@ public class partitionNode {
 
     static int freeAllocation(int processID) {
         //根据输入的processID寻找进程所在的分区
-         partitionNode pointer = headNode;
+         BlockNode pointer = headNode;
         while (pointer!=null) {
             if (pointer.processID == processID) {
                 break;
@@ -124,8 +124,8 @@ public class partitionNode {
         if (pointer != headNode && pointer.previous.status == 0 &&
                 pointer.previous.startingAddress + pointer.previous.size == pointer.startingAddress) {
             //前面紧接着一个size不为0的空闲分区
-             partitionNode preNode = pointer.previous;
-             partitionNode nextNode = pointer.next;
+             BlockNode preNode = pointer.previous;
+             BlockNode nextNode = pointer.next;
 
             preNode.size += pointer.size;
             preNode.next = pointer.next;
@@ -146,7 +146,7 @@ public class partitionNode {
             if (pointer.next != null && pointer.next.status == 0 &&
                     pointer.startingAddress + pointer.size == pointer.next.startingAddress) {
                 //后面紧接着一个size不为0的空闲分区
-                 partitionNode nextNode = pointer.next;
+                 BlockNode nextNode = pointer.next;
                 pointer.size += nextNode.size;
                 pointer.next = nextNode.next;
                 if(nextNode.next!=null)nextNode.next.previous = pointer;
@@ -164,7 +164,7 @@ public class partitionNode {
     }
 
     static void displayAllocation() {
-         partitionNode pointer = headNode;
+         BlockNode pointer = headNode;
 
         System.out.print("\n|分区号\t|起始地址\t|分区大小\t|分区状态\n");
 
