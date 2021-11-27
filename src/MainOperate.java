@@ -94,6 +94,13 @@ public class MainOperate {
                     }
                     System.out.println("平均带权周转时间= " +String.format("%.2f", averageTime/DoneJobs.size()));
                     occurCPU = false;
+                    System.out.println("按回车键退出");
+                    BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(System.in));
+                    try {
+                        bufferedReader.readLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     return;
                 } else {
                     System.out.println("时间：" + everySecond.getTime() + "  无进程可调度");
@@ -130,8 +137,9 @@ public class MainOperate {
                 sortedJobs.add(nowJob);
                 //sortedJobs.sort((o1, o2) -> o1.getServiceTime() - o2.getServiceTime());
                 sortedJobs.sort((o1, o2) -> o1.getSize() - o2.getSize());
-                processScheduling();
+
             }
+            processScheduling();
             nowJob = null;
         }
         /** 作业调度 first come first serve*/
@@ -143,8 +151,9 @@ public class MainOperate {
                 sortedJobs.sort((o1, o2) -> o1.getSubmitTime() - o2.getSubmitTime());
 
                 //尝试分配
-                processScheduling();
+
             }
+            processScheduling();
             nowJob = null;
         }
         /** 作业调度 (priority-scheduling algorithm)*/
@@ -154,8 +163,9 @@ public class MainOperate {
                 sortedJobs.add(nowJob);
                 //尝试分配
                 sortedJobs.sort((o1, o2) -> o1.getDegree() - o2.getDegree());
-                processScheduling();
+
             }
+            processScheduling();
             nowJob = null;
         }
         /** 作业调度 (Highest Response Ratio Next)*/
@@ -166,8 +176,9 @@ public class MainOperate {
                 //尝试分配
                 sortedJobs.sort((o1, o2) -> (everySecond.getTime()-o1.getSubmitTime()+o1.getServiceTime())/o1.getServiceTime() -
                         (everySecond.getTime()-o2.getSubmitTime()+o2.getServiceTime())/o2.getServiceTime());
-                processScheduling();
+
             }
+            processScheduling();
             nowJob = null;
         }
         /** 从输入井中添加作业到缓冲队列*/
@@ -203,7 +214,7 @@ public class MainOperate {
         job.setID(idCount++);
         inputWell.add(job);
     }
-    /** 进程调度*/
+    /** 作业调度和进程调度*/
     public void processScheduling() {
         if ( sortedJobs.size()>=1 && BlockNode.allocateResult >= 1) {
             //按作业调度顺序来分配

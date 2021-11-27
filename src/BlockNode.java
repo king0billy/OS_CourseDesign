@@ -162,10 +162,17 @@ public class BlockNode {
     static void displayAllocation() {
          BlockNode pointer = headNode;
 
-        System.out.print("\n|分区号\t|起始地址\t|分区大小\t|分区状态\n");
+        //System.out.print("\n|分区号\t\t|起始地址\t\t|分区大小\t\t|分区状态\n");
+        System.out.printf("\n|分区号\t\t");
+        System.out.printf("|起址\t\t");
+        System.out.printf("|大小\t\t");
+        System.out.printf("|状态\n");
 
         while (pointer!=null) {
-            System.out.print("|"+pointer.processID+"\t\t|"+pointer.startingAddress+"\t\t|"+pointer.size+"\t\t|");
+            //System.out.print("|"+pointer.processID+"\t\t|"+pointer.startingAddress+"\t\t|"+pointer.size+"\t\t|");
+            System.out.printf("|"+pointer.processID+"\t\t");
+            System.out.printf("|"+pointer.startingAddress+"\t\t");
+            System.out.printf("|"+pointer.size+"\t\t|");
             if(pointer.status==1)System.out.print("已分配");
             else System.out.print("空闲");
             System.out.print("\n");

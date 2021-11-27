@@ -11,7 +11,7 @@ public class Job {
     private int roundTime;    //周转时间
     private double averageRoundTime; //带权周转时间
     private char status;      //当前状态  W代表waiting R代表running F代表finished
-    private int priority;        //优先级
+    private int priority=0;        //优先级
     private int arriveReadyTime=99999999;//成功作业调度进入内存的时间
 
     public int getArriveReadyTime() {
@@ -162,7 +162,7 @@ public String printNeed() {
     return "" + getName() + "  提交时间：" + timeFormat(getSubmitTime()) +
             "\t  运行时间：" + getTime() +
             "  状态：" + getStatus() + "\t  所需服务时间：" + getServiceTime() +
-            "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded();
+            "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded()+"  优先级数"+getDegree();
 
 }
     public String printResult() {
@@ -170,7 +170,7 @@ public String printNeed() {
                 "\t  结束时间：" + timeFormat(getFinishTime()) + "  运行时间：" + getTime() +
                 "  周转时间：" + getRoundTime() + "  带权周转时间：" + String.format("%.2f", getAveRoundTime()) +
                 "\t  所需服务时间：" + getServiceTime() +
-                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded();//+"  优先级数"+getDegree();
+                "  所需块大小"+getSize()+"  磁带机需求"+getTapeNeeded()+"  优先级数"+getDegree();
     }
     public static String timeFormat( int runTime){
         int hour=10;int min=0;
